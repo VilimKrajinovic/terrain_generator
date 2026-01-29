@@ -58,6 +58,8 @@ set(SOURCES
     # Utils
     src/utils/file_io.c
     src/utils/arena.c
+    # Third party
+    third_party/stb_impl.c
 )
 
 # Create executable
@@ -66,6 +68,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 # Include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb
     ${Vulkan_INCLUDE_DIRS}
 )
 
