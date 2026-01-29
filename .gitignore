@@ -1,0 +1,45 @@
+# Build output directories
+/build/
+/build-*/
+/cmake-build-*/
+/out/
+/dist/
+/bin/
+
+# CMake generated files (in case of in-source builds)
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+cmake_install.cmake
+Makefile
+compile_commands.json
+CTestTestfile.cmake
+DartConfiguration.tcl
+
+# Compiled objects and binaries
+*.o
+*.obj
+*.d
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# IDE/editor folders
+.vscode/
+.idea/
+*.xcodeproj/
+*.xcworkspace/
+
+# Tooling caches
+.cache/
+.claude/
+CLAUDE.md
+
+# OS metadata
+.DS_Store
+Thumbs.db
