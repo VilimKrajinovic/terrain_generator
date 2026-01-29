@@ -1,0 +1,91 @@
+# Terrain Simulator
+
+A Vulkan-based terrain simulation application written in C.
+
+## Requirements
+
+- CMake 3.20+
+- C11 compiler (Clang or GCC)
+- Vulkan SDK
+- SDL3
+
+### macOS
+
+```bash
+brew install sdl3
+```
+
+Download and install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home).
+
+### Linux
+
+```bash
+# Ubuntu/Debian
+sudo apt install libsdl3-dev libvulkan-dev vulkan-tools
+
+# Fedora
+sudo dnf install SDL3-devel vulkan-loader-devel vulkan-tools
+```
+
+## Building
+
+```bash
+./build.sh
+```
+
+Or manually:
+
+```bash
+mkdir -p build
+cmake -S . -B build
+cmake --build build
+```
+
+## Running
+
+```bash
+./build.sh run
+```
+
+Or manually:
+
+```bash
+./build/terrain_sim
+```
+
+Press `ESC` to exit the application.
+
+## Project Structure
+
+```
+src/
+├── core/           # Application core (app, logging)
+├── geometry/       # Mesh and geometry (quad)
+├── platform/       # Platform abstraction (window, input)
+├── renderer/       # Vulkan renderer
+│   ├── renderer.c      # Main renderer
+│   ├── vk_instance.c   # Vulkan instance
+│   ├── vk_device.c     # Device selection
+│   ├── vk_swapchain.c  # Swapchain management
+│   ├── vk_pipeline.c   # Graphics pipeline
+│   ├── vk_shader.c     # Shader loading
+│   └── ...
+├── utils/          # Utilities (types, arena allocator, file I/O)
+└── main.c          # Entry point
+shaders/
+├── basic.vert      # Vertex shader
+└── basic.frag      # Fragment shader
+```
+
+## Memory Management
+
+The project uses arena-based allocation following Ryan Fleury's pattern:
+
+- **Permanent Arena** (2 MB): All application-lifetime allocations
+- **Scratch Arena** (256 KB): Temporary allocations within function scope
+
+This eliminates individual malloc/free calls and enables bulk deallocation.
+
+## License
+
+MIT
