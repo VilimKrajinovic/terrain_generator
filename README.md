@@ -81,10 +81,12 @@ shaders/
 
 The project uses arena-based allocation following Ryan Fleury's pattern:
 
-- **Permanent Arena** (2 MB): All application-lifetime allocations
-- **Scratch Arena** (256 KB): Temporary allocations within function scope
+- **Permanent Arena** : All application-lifetime allocations
+- **Scratch Arena** : Temporary allocations within function scope
 
 This eliminates individual malloc/free calls and enables bulk deallocation.
+
+More about it can be found [here on his blog post](https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator).
 
 ## License
 
