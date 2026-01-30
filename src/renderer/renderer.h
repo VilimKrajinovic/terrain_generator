@@ -39,6 +39,8 @@ typedef struct RendererContext {
     // Framebuffers
     VkFramebuffer *framebuffers;
     u32 framebuffer_count;
+    VkFence images_in_flight[MAX_SWAPCHAIN_IMAGES];
+    VkSemaphore render_finished[MAX_SWAPCHAIN_IMAGES];
 
     // Geometry
     VkBufferContext *vertex_buffer;

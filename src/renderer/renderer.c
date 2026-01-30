@@ -12,6 +12,8 @@
 static VkResult create_framebuffers(RendererContext *ctx, Arena *arena);
 static void destroy_framebuffers(RendererContext *ctx);
 static VkResult recreate_swapchain(RendererContext *ctx, u32 width, u32 height);
+static VkResult create_render_finished(RendererContext *ctx);
+static void destroy_render_finished(RendererContext *ctx);
 
 Result renderer_init(RendererContext *ctx, WindowContext *window, const RendererConfig *config, Arena *arena) {
     LOG_INFO("Initializing renderer");
@@ -62,10 +64,24 @@ Result renderer_init(RendererContext *ctx, WindowContext *window, const Renderer
         return RESULT_ERROR_VULKAN;
     }
 
+    memset(ctx->images_in_flight, 0, sizeof(ctx->images_in_flight));
+    memset(ctx->render_finished, 0, sizeof(ctx->render_finished));
+
+    result = create_render_finished(ctx);
+    if (result != VK_SUCCESS) {
+        LOG_ERROR("Failed to create render finished semaphores");
+        vk_swapchain_destroy(&ctx->device, &ctx->swapchain);
+        vk_device_destroy(&ctx->device);
+        vkDestroySurfaceKHR(ctx->instance.instance, ctx->surface, NULL);
+        vk_instance_destroy(&ctx->instance);
+        return RESULT_ERROR_VULKAN;
+    }
+
     // Create sync objects
     result = vk_sync_create(ctx->device.device, &ctx->sync);
     if (result != VK_SUCCESS) {
         LOG_ERROR("Failed to create sync objects");
+        destroy_render_finished(ctx);
         vk_swapchain_destroy(&ctx->device, &ctx->swapchain);
         vk_device_destroy(&ctx->device);
         vkDestroySurfaceKHR(ctx->instance.instance, ctx->surface, NULL);
@@ -196,6 +212,9 @@ void renderer_shutdown(RendererContext *ctx) {
     // Destroy sync objects
     vk_sync_destroy(ctx->device.device, &ctx->sync);
 
+    // Destroy render-finished semaphores
+    destroy_render_finished(ctx);
+
     // Destroy swapchain
     vk_swapchain_destroy(&ctx->device, &ctx->swapchain);
 
@@ -233,8 +252,13 @@ void renderer_draw_frame(RendererContext *ctx) {
         return;
     }
 
+    if (ctx->images_in_flight[image_index] != VK_NULL_HANDLE) {
+        vkWaitForFences(ctx->device.device, 1, &ctx->images_in_flight[image_index], VK_TRUE, UINT64_MAX);
+    }
+
     // Reset fence only when we're sure we're submitting work
     vk_sync_reset_fence(ctx->device.device, &ctx->sync);
+    ctx->images_in_flight[image_index] = frame->in_flight;
 
     // Get command buffer
     VkCommandBuffer cmd = vk_command_get_buffer(&ctx->command, ctx->sync.current_frame);
@@ -297,7 +321,7 @@ void renderer_draw_frame(RendererContext *ctx) {
     // Submit
     VkSemaphore wait_semaphores[] = {frame->image_available};
     VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-    VkSemaphore signal_semaphores[] = {frame->render_finished};
+    VkSemaphore signal_semaphores[] = {ctx->render_finished[image_index]};
 
     VkSubmitInfo submit_info = {
         .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -404,6 +428,7 @@ static VkResult recreate_swapchain(RendererContext *ctx, u32 width, u32 height) 
 
     // Destroy old Vulkan resources
     destroy_framebuffers(ctx);
+    destroy_render_finished(ctx);
 
     // Recreate swapchain
     VkResult result = vk_swapchain_recreate(&ctx->device, ctx->surface, width, height, &ctx->swapchain);
@@ -411,6 +436,42 @@ static VkResult recreate_swapchain(RendererContext *ctx, u32 width, u32 height) 
         return result;
     }
 
+    memset(ctx->images_in_flight, 0, sizeof(ctx->images_in_flight));
+    memset(ctx->render_finished, 0, sizeof(ctx->render_finished));
+
+    result = create_render_finished(ctx);
+    if (result != VK_SUCCESS) {
+        return result;
+    }
+
     // Recreate framebuffers (uses arena stored in ctx)
     return create_framebuffers(ctx, ctx->arena);
+}
+
+static VkResult create_render_finished(RendererContext *ctx) {
+    VkSemaphoreCreateInfo semaphore_info = {
+        .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+    };
+
+    for (u32 i = 0; i < ctx->swapchain.image_count; i++) {
+        VkResult result = vkCreateSemaphore(ctx->device.device, &semaphore_info, NULL, &ctx->render_finished[i]);
+        if (result != VK_SUCCESS) {
+            for (u32 j = 0; j < i; j++) {
+                vkDestroySemaphore(ctx->device.device, ctx->render_finished[j], NULL);
+                ctx->render_finished[j] = VK_NULL_HANDLE;
+            }
+            return result;
+        }
+    }
+
+    return VK_SUCCESS;
+}
+
+static void destroy_render_finished(RendererContext *ctx) {
+    for (u32 i = 0; i < ctx->swapchain.image_count; i++) {
+        if (ctx->render_finished[i] != VK_NULL_HANDLE) {
+            vkDestroySemaphore(ctx->device.device, ctx->render_finished[i], NULL);
+            ctx->render_finished[i] = VK_NULL_HANDLE;
+        }
+    }
 }
