@@ -1,7 +1,7 @@
 #include "vk_shader.h"
 #include "core/log.h"
 #include "utils/file_io.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
 
 VkResult vk_shader_load(VkDevice device, const char *path, VkShaderModule *module) {
     LOG_DEBUG("Loading shader: %s", path);

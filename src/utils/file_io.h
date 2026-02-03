@@ -2,7 +2,7 @@
 #define FILE_IO_H
 
 #include "utils/types.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
 #include <stddef.h>
 
 // Read entire file into memory (arena allocated)

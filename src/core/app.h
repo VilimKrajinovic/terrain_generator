@@ -2,7 +2,7 @@
 #define APP_H
 
 #include "platform/window.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
 #include "utils/types.h"
 
 // Forward declarations

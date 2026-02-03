@@ -57,7 +57,9 @@ set(SOURCES
     src/geometry/quad.c
     # Utils
     src/utils/file_io.c
-    src/utils/arena.c
+    # Memory
+    src/memory/arena.c
+    src/memory/memory.c
     # Third party
     third_party/stb_impl.c
 )

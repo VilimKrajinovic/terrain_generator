@@ -2,10 +2,9 @@
 #include "core/log.h"
 #include "platform/input.h"
 #include "renderer/renderer.h"
+#include "utils/macros.h"
 
 #include <SDL3/SDL_timer.h>
-
-#define PERMANENT_ARENA_SIZE (64 * 1024 * 1024)
 
 AppConfig app_config_default(void) {
   return (AppConfig){
@@ -52,7 +51,7 @@ Result app_init(AppContext *app, const AppConfig *config) {
   input_init(&app->window);
 
   // Create permanent arena
-  app->permanent_arena = arena_create(PERMANENT_ARENA_SIZE);
+  app->permanent_arena = arena_create(MEGABYTES(64));
   if (!app->permanent_arena.base) {
     LOG_ERROR("Failed to create permanent arena");
     window_destroy(&app->window);

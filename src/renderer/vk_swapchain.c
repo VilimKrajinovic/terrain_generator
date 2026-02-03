@@ -1,7 +1,7 @@
 #include "vk_swapchain.h"
 #include "core/log.h"
 #include "utils/macros.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
 #include <string.h>
 
 SwapchainSupportDetails vk_swapchain_query_support(VkPhysicalDevice device, VkSurfaceKHR surface, Arena *arena) {

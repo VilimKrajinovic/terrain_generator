@@ -3,7 +3,7 @@
 
 #include <vulkan/vulkan.h>
 #include "utils/types.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
 #include "renderer/vk_device.h"
 
 // Maximum number of swapchain images

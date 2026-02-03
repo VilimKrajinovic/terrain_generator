@@ -2,7 +2,7 @@
 #define QUAD_H
 
 #include "geometry/mesh.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
 
 // Create a colored quad mesh using arena allocation
 void quad_create_arena(Mesh *mesh, Arena *arena);

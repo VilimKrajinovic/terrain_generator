@@ -1,9 +1,8 @@
 #include "core/app.h"
 #include "core/log.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
+#include "utils/macros.h"
 #include <stdlib.h>
-
-#define SCRATCH_ARENA_SIZE (4 * 1024 * 1024)
 
 int main(int argc, char *argv[]) {
     (void)argc;
@@ -15,7 +14,7 @@ int main(int argc, char *argv[]) {
     LOG_INFO("=== Terrain Simulator ===");
 
     // Initialize scratch arena for temporary allocations
-    arena_scratch_init(SCRATCH_ARENA_SIZE);
+    arena_scratch_init(MEGABYTES(16));
 
     // Create application
     AppContext app = {0};

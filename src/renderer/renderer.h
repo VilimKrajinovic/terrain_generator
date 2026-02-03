@@ -2,7 +2,7 @@
 #define RENDERER_H
 
 #include "utils/types.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
 #include "platform/window.h"
 #include "renderer/vk_instance.h"
 #include "renderer/vk_device.h"

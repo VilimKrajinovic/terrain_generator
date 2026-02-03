@@ -41,4 +41,15 @@
 // Unused parameter macro
 #define UNUSED(x) (void)(x)
 
+#define KILOBYTES(Value) ((Value) * 1024)
+#define MEGABYTES(Value) (KILOBYTES(Value) * 1024)
+#define GIGABYTES(Value) (MEGABYTES(Value) * 1024)
+
+
+#if DEBUG
+#define ASSERT(Predicate) if(!(Predicate)) {* (int *)0 = 0;}
+#else
+#define ASSERT(Predicate)
+#endif
+
 #endif // MACROS_H

@@ -1,7 +1,7 @@
 #include "vk_device.h"
 #include "core/log.h"
 #include "utils/macros.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
 #include <string.h>
 
 // Required device extensions

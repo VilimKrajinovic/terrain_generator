@@ -2,7 +2,7 @@
 #include "core/log.h"
 #include "platform/window.h"
 #include "utils/macros.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
 #include <string.h>
 
 // Validation layer name

@@ -2,7 +2,7 @@
 #define MESH_H
 
 #include "utils/types.h"
-#include "utils/arena.h"
+#include "memory/arena.h"
 
 // Mesh structure
 typedef struct Mesh {
