@@ -28,10 +28,17 @@ void *arena_alloc_aligned(Arena *arena, size_t size, size_t alignment);
 ArenaTemp arena_temp_begin(Arena *arena);
 void      arena_temp_end(ArenaTemp temp);
 
+// Optional debug fill when clearing arenas. Define ARENA_DEBUG_FILL to enable.
+#ifndef ARENA_DEBUG_FILL_BYTE
+#define ARENA_DEBUG_FILL_BYTE 0xDD
+#endif
+
 // Global scratch arena for temporary allocations
 void arena_scratch_init(size_t size);
 void arena_scratch_shutdown(void);
 ArenaTemp arena_scratch_begin(void);
+void arena_scratch_set(Arena *arena);
+Arena *arena_scratch_get(void);
 
 // Helper macros for typed allocation
 #define ARENA_PUSH_STRUCT(arena, type) \

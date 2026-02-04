@@ -1,8 +1,8 @@
 #ifndef APP_H
 #define APP_H
 
+#include "memory/memory.h"
 #include "platform/window.h"
-#include "memory/arena.h"
 #include "utils/types.h"
 
 // Forward declarations
@@ -28,8 +28,8 @@ typedef struct AppConfig {
 typedef struct AppContext {
   AppConfig config;
   AppState state;
+  MemoryContext memory;
   WindowContext window;
-  Arena permanent_arena;
   RendererContext *renderer;
   f64 delta_time;
   f64 total_time;

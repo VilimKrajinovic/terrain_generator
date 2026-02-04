@@ -50,20 +50,27 @@ Result app_init(AppContext *app, const AppConfig *config) {
   // Initialize input
   input_init(&app->window);
 
-  // Create permanent arena
-  app->permanent_arena = arena_create(MEGABYTES(64));
-  if (!app->permanent_arena.base) {
-    LOG_ERROR("Failed to create permanent arena");
+  // Initialize memory arenas
+  app->memory = (MemoryContext){0};
+  MemoryConfig memory_config = {
+      .permanent_size = MEGABYTES(64),
+      .transient_size = MEGABYTES(32),
+      .frame_size = MEGABYTES(16),
+      .scratch_size = MEGABYTES(16),
+  };
+
+  if (!memory_init(&app->memory, &memory_config)) {
+    LOG_ERROR("Failed to initialize memory arenas");
     window_destroy(&app->window);
     window_system_shutdown();
     return RESULT_ERROR_OUT_OF_MEMORY;
   }
 
   // Initialize renderer
-  app->renderer = ARENA_PUSH_STRUCT(&app->permanent_arena, RendererContext);
+  app->renderer = ARENA_PUSH_STRUCT(memory_arena(&app->memory, MEMORY_ARENA_PERMANENT), RendererContext);
   if (!app->renderer) {
     LOG_ERROR("Failed to allocate renderer context");
-    arena_destroy(&app->permanent_arena);
+    memory_shutdown(&app->memory);
     window_destroy(&app->window);
     window_system_shutdown();
     return RESULT_ERROR_OUT_OF_MEMORY;
@@ -75,10 +82,10 @@ Result app_init(AppContext *app, const AppConfig *config) {
   };
 
   result = renderer_init(app->renderer, &app->window, &renderer_config,
-                         &app->permanent_arena);
+                         memory_arena(&app->memory, MEMORY_ARENA_PERMANENT));
   if (result != RESULT_SUCCESS) {
     LOG_ERROR("Failed to initialize renderer");
-    arena_destroy(&app->permanent_arena);
+    memory_shutdown(&app->memory);
     window_destroy(&app->window);
     window_system_shutdown();
     return result;
@@ -98,8 +105,8 @@ void app_shutdown(AppContext *app) {
     app->renderer = NULL;
   }
 
-  // Destroy permanent arena (frees all app-lifetime allocations)
-  arena_destroy(&app->permanent_arena);
+  // Destroy arenas (frees all app-lifetime allocations)
+  memory_shutdown(&app->memory);
 
   window_destroy(&app->window);
   window_system_shutdown();
@@ -122,6 +129,9 @@ void app_run(AppContext *app) {
 
     // Update input
     input_update();
+
+    // Reset per-frame arena
+    memory_begin_frame(&app->memory);
 
     // Poll events
     window_poll_events(&app->window);
