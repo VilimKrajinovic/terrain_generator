@@ -4,6 +4,19 @@
 #include <SDL3/SDL.h>
 #include <string.h>
 
+typedef struct InputState {
+    bool keys[SDL_SCANCODE_COUNT];
+    bool keys_previous[SDL_SCANCODE_COUNT];
+    bool mouse_buttons[8];
+    bool mouse_buttons_previous[8];
+    f64 mouse_x;
+    f64 mouse_y;
+    f64 mouse_dx;
+    f64 mouse_dy;
+    f64 scroll_x;
+    f64 scroll_y;
+} InputState;
+
 static InputState g_input = {0};
 static u32 g_window_id = 0;
 
@@ -41,9 +54,9 @@ static i32 mouse_button_to_index(Uint8 button) {
     }
 }
 
-void input_init(WindowContext *window) {
+void input_init(void) {
     memset(&g_input, 0, sizeof(g_input));
-    g_window_id = window->window_id;
+    g_window_id = 0;
 
     float mx = 0.0f;
     float my = 0.0f;
@@ -52,6 +65,10 @@ void input_init(WindowContext *window) {
     g_input.mouse_y = (f64)my;
 
     LOG_INFO("Input system initialized");
+}
+
+void input_attach_window(u32 window_id) {
+    g_window_id = window_id;
 }
 
 void input_update(void) {

@@ -1,8 +1,8 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "utils/types.h"
 #include "memory/arena.h"
+#include "geometry/vertex.h"
 
 // Mesh structure
 typedef struct Mesh {

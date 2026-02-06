@@ -1,6 +1,5 @@
 #include "window.h"
 #include "core/log.h"
-#include "platform/input.h"
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
@@ -45,8 +44,6 @@ static void window_handle_event(WindowContext *ctx, const SDL_Event *event) {
   default:
     break;
   }
-
-  input_handle_event(event);
 }
 
 WindowConfig window_config_default(void) {
@@ -114,22 +111,30 @@ void window_destroy(WindowContext *ctx) {
 
 bool window_should_close(WindowContext *ctx) { return ctx->should_close; }
 
-void window_poll_events(WindowContext *ctx) {
-  SDL_Event event;
-  while (SDL_PollEvent(&event)) {
-    window_handle_event(ctx, &event);
+bool window_poll_event(WindowContext *ctx, SDL_Event *event) {
+  if (!event) {
+    return false;
   }
+
+  if (!SDL_PollEvent(event)) {
+    return false;
+  }
+
+  window_handle_event(ctx, event);
+  return true;
 }
 
-void window_wait_events(WindowContext *ctx) {
-  SDL_Event event;
-  if (SDL_WaitEvent(&event)) {
-    window_handle_event(ctx, &event);
+bool window_wait_event(WindowContext *ctx, SDL_Event *event) {
+  if (!event) {
+    return false;
   }
 
-  while (SDL_PollEvent(&event)) {
-    window_handle_event(ctx, &event);
+  if (!SDL_WaitEvent(event)) {
+    return false;
   }
+
+  window_handle_event(ctx, event);
+  return true;
 }
 
 void window_get_framebuffer_size(WindowContext *ctx, u32 *width, u32 *height) {

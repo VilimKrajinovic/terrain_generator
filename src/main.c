@@ -1,10 +1,11 @@
 #include "core/app.h"
 #include "core/log.h"
+#include "utils/macros.h"
 #include <stdlib.h>
 
 int main(int argc, char *argv[]) {
-    (void)argc;
-    (void)argv;
+    UNUSED(argc);
+    UNUSED(argv);
 
     // Initialize logging
     log_init(LOG_LEVEL_DEBUG);

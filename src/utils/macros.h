@@ -3,6 +3,7 @@
 
 #include <vulkan/vulkan.h>
 #include "core/log.h"
+#include "foundation/result.h"
 
 // Array size macro
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))

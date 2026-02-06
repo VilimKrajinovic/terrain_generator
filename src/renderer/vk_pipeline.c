@@ -1,7 +1,8 @@
 #include "vk_pipeline.h"
 #include "vk_shader.h"
 #include "core/log.h"
-#include "utils/types.h"
+#include "geometry/vertex.h"
+#include <stddef.h>
 #include <string.h>
 
 // Get vertex binding description

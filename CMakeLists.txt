@@ -42,7 +42,9 @@ set(SOURCES
     src/platform/window.c
     src/platform/input.c
     # Renderer
-    src/renderer/renderer.c
+    src/renderer/renderer_init.c
+    src/renderer/renderer_frame.c
+    src/renderer/renderer_swapchain.c
     src/renderer/vk_instance.c
     src/renderer/vk_device.c
     src/renderer/vk_swapchain.c
@@ -55,6 +57,8 @@ set(SOURCES
     # Geometry
     src/geometry/mesh.c
     src/geometry/quad.c
+    # Simulation
+    src/simulation/simulation.c
     # Utils
     src/utils/file_io.c
     # Memory

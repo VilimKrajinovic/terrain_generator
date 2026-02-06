@@ -3,10 +3,12 @@
 
 #include "memory/memory.h"
 #include "platform/window.h"
+#include "foundation/result.h"
+#include "simulation/simulation.h"
 #include "utils/types.h"
 
 // Forward declarations
-typedef struct RendererContext RendererContext;
+typedef struct Renderer Renderer;
 
 // Application state
 typedef enum AppState {
@@ -30,7 +32,8 @@ typedef struct AppContext {
   AppState state;
   MemoryContext memory;
   WindowContext window;
-  RendererContext *renderer;
+  Renderer *renderer;
+  SimulationState simulation;
   f64 delta_time;
   f64 total_time;
   u64 frame_count;

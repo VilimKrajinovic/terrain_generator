@@ -103,24 +103,28 @@ ArenaTemp memory_scratch_begin(MemoryContext *memory) {
   return arena_temp_begin(scratch_arena);
 }
 
+// If setup, returns the permanent arena pointer
 Arena *permanent_memory(MemoryContext *memory) {
   if (!memory) {
     return NULL;
   }
   return &memory->arenas[MEMORY_ARENA_PERMANENT];
 }
+
 Arena *transient_memory(MemoryContext *memory) {
   if (!memory) {
     return NULL;
   }
   return &memory->arenas[MEMORY_ARENA_TRANSIENT];
 }
+
 Arena *frame_memory(MemoryContext *memory) {
   if (!memory) {
     return NULL;
   }
   return &memory->arenas[MEMORY_ARENA_FRAME];
 }
+
 Arena *scratch_memory(MemoryContext *memory) {
   if (!memory) {
     return NULL;

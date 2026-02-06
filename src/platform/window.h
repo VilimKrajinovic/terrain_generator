@@ -2,6 +2,8 @@
 #define WINDOW_H
 
 #include "utils/types.h"
+#include "foundation/result.h"
+#include <SDL3/SDL_events.h>
 #include <vulkan/vulkan.h>
 
 // Forward declaration
@@ -45,11 +47,11 @@ void window_destroy(WindowContext *ctx);
 // Check if window should close
 bool window_should_close(WindowContext *ctx);
 
-// Poll window events
-void window_poll_events(WindowContext *ctx);
+// Poll one event (returns false when queue is empty)
+bool window_poll_event(WindowContext *ctx, SDL_Event *event);
 
-// Wait for events (blocks)
-void window_wait_events(WindowContext *ctx);
+// Wait for one event (blocks until event available or failure)
+bool window_wait_event(WindowContext *ctx, SDL_Event *event);
 
 // Get framebuffer size (may differ from window size on HiDPI)
 void window_get_framebuffer_size(WindowContext *ctx, u32 *width, u32 *height);

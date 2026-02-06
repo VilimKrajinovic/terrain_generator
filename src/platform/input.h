@@ -2,7 +2,6 @@
 #define INPUT_H
 
 #include "utils/types.h"
-#include "platform/window.h"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
@@ -43,22 +42,11 @@ typedef enum MouseButton {
     MOUSE_BUTTON_RIGHT = SDL_BUTTON_RIGHT,
 } MouseButton;
 
-// Input state
-typedef struct InputState {
-    bool keys[SDL_SCANCODE_COUNT];
-    bool keys_previous[SDL_SCANCODE_COUNT];
-    bool mouse_buttons[8];
-    bool mouse_buttons_previous[8];
-    f64 mouse_x;
-    f64 mouse_y;
-    f64 mouse_dx;
-    f64 mouse_dy;
-    f64 scroll_x;
-    f64 scroll_y;
-} InputState;
+// Initialize input system
+void input_init(void);
 
-// Initialize input system for a window
-void input_init(WindowContext *window);
+// Attach input to a window id (0 means all windows)
+void input_attach_window(u32 window_id);
 
 // Update input state (call once per frame before polling events)
 void input_update(void);

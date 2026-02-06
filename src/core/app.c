@@ -20,6 +20,8 @@ Result app_init(AppContext *app, const AppConfig *config) {
 
   app->config = *config;
   app->state = APP_STATE_UNINITIALIZED;
+  app->renderer = NULL;
+  app->simulation = (SimulationState){0};
   app->delta_time = 0.0;
   app->total_time = 0.0;
   app->frame_count = 0;
@@ -48,7 +50,8 @@ Result app_init(AppContext *app, const AppConfig *config) {
   }
 
   // Initialize input
-  input_init(&app->window);
+  input_init();
+  input_attach_window(app->window.window_id);
 
   // Initialize memory arenas
   app->memory = (MemoryContext){0};
@@ -66,14 +69,15 @@ Result app_init(AppContext *app, const AppConfig *config) {
     return RESULT_ERROR_OUT_OF_MEMORY;
   }
 
-  // Initialize renderer
-  app->renderer = ARENA_PUSH_STRUCT(memory_arena(&app->memory, MEMORY_ARENA_PERMANENT), RendererContext);
-  if (!app->renderer) {
-    LOG_ERROR("Failed to allocate renderer context");
+  result = simulation_init(
+      &app->simulation,
+      memory_arena(&app->memory, MEMORY_ARENA_PERMANENT));
+  if (result != RESULT_SUCCESS) {
+    LOG_ERROR("Failed to initialize simulation");
     memory_shutdown(&app->memory);
     window_destroy(&app->window);
     window_system_shutdown();
-    return RESULT_ERROR_OUT_OF_MEMORY;
+    return result;
   }
 
   RendererConfig renderer_config = {
@@ -81,10 +85,12 @@ Result app_init(AppContext *app, const AppConfig *config) {
       .enable_validation = config->enable_validation,
   };
 
-  result = renderer_init(app->renderer, &app->window, &renderer_config,
-                         memory_arena(&app->memory, MEMORY_ARENA_PERMANENT));
+  result = renderer_create(
+      &app->renderer, &app->window, &renderer_config,
+      memory_arena(&app->memory, MEMORY_ARENA_PERMANENT));
   if (result != RESULT_SUCCESS) {
     LOG_ERROR("Failed to initialize renderer");
+    simulation_shutdown(&app->simulation);
     memory_shutdown(&app->memory);
     window_destroy(&app->window);
     window_system_shutdown();
@@ -101,9 +107,11 @@ void app_shutdown(AppContext *app) {
   app->state = APP_STATE_SHUTTING_DOWN;
 
   if (app->renderer) {
-    renderer_shutdown(app->renderer);
+    renderer_destroy(app->renderer);
     app->renderer = NULL;
   }
+
+  simulation_shutdown(&app->simulation);
 
   // Destroy arenas (frees all app-lifetime allocations)
   memory_shutdown(&app->memory);
@@ -118,6 +126,7 @@ void app_run(AppContext *app) {
   LOG_INFO("Starting main loop");
 
   u64 last_ticks = SDL_GetTicksNS();
+  Result result = RESULT_SUCCESS;
 
   while (!window_should_close(&app->window) &&
          app->state == APP_STATE_RUNNING) {
@@ -134,7 +143,10 @@ void app_run(AppContext *app) {
     memory_begin_frame(&app->memory);
 
     // Poll events
-    window_poll_events(&app->window);
+    SDL_Event event;
+    while (window_poll_event(&app->window, &event)) {
+      input_handle_event(&event);
+    }
 
     // Handle escape key
     if (input_key_pressed(KEY_ESCAPE)) {
@@ -144,18 +156,36 @@ void app_run(AppContext *app) {
 
     // Skip rendering if minimized
     if (app->window.minimized) {
-      window_wait_events(&app->window);
+      if (window_wait_event(&app->window, &event)) {
+        input_handle_event(&event);
+        while (window_poll_event(&app->window, &event)) {
+          input_handle_event(&event);
+        }
+      }
+      input_reset_scroll();
       continue;
     }
 
     // Handle window resize
     if (app->window.resized) {
-      renderer_handle_resize(app->renderer, &app->window);
+      result = renderer_resize(app->renderer);
       window_reset_resized(&app->window);
+      if (result != RESULT_SUCCESS) {
+        LOG_ERROR("Renderer resize failed: %d", result);
+        app_request_shutdown(app);
+        continue;
+      }
     }
 
+    simulation_update(&app->simulation, app->delta_time);
+
     // Render frame
-    renderer_draw_frame(app->renderer);
+    result = renderer_draw(app->renderer);
+    if (result != RESULT_SUCCESS) {
+      LOG_ERROR("Renderer frame failed: %d", result);
+      app_request_shutdown(app);
+      continue;
+    }
 
     app->frame_count++;
 
@@ -164,7 +194,9 @@ void app_run(AppContext *app) {
   }
 
   // Wait for device idle before shutdown
-  renderer_wait_idle(app->renderer);
+  if (app->renderer) {
+    renderer_wait_idle(app->renderer);
+  }
 
   LOG_INFO("Main loop ended after %llu frames", app->frame_count);
 }

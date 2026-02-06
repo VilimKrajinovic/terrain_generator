@@ -60,17 +60,22 @@ Press `ESC` to exit the application.
 ```
 src/
 ├── core/           # Application core (app, logging)
+├── foundation/     # Shared foundation types (result codes)
 ├── geometry/       # Mesh and geometry (quad)
+├── memory/         # Arena allocator and memory lifetimes
 ├── platform/       # Platform abstraction (window, input)
 ├── renderer/       # Vulkan renderer
-│   ├── renderer.c      # Main renderer
+│   ├── renderer_init.c     # Renderer setup and teardown
+│   ├── renderer_frame.c    # Per-frame rendering path
+│   ├── renderer_swapchain.c# Swapchain/framebuffer lifecycle
 │   ├── vk_instance.c   # Vulkan instance
 │   ├── vk_device.c     # Device selection
 │   ├── vk_swapchain.c  # Swapchain management
 │   ├── vk_pipeline.c   # Graphics pipeline
 │   ├── vk_shader.c     # Shader loading
 │   └── ...
-├── utils/          # Utilities (types, arena allocator, file I/O)
+├── simulation/     # Simulation lifecycle (init/update/shutdown)
+├── utils/          # Utilities (types, macros, file I/O)
 └── main.c          # Entry point
 shaders/
 ├── basic.vert      # Vertex shader
