@@ -7,7 +7,7 @@
 
 // Get vertex binding description
 static VkVertexInputBindingDescription get_vertex_binding_description(void) {
-    return (VkVertexInputBindingDescription){
+    return VkVertexInputBindingDescription{
         .binding = 0,
         .stride = sizeof(Vertex),
         .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
@@ -17,7 +17,7 @@ static VkVertexInputBindingDescription get_vertex_binding_description(void) {
 // Get vertex attribute descriptions
 static void get_vertex_attribute_descriptions(VkVertexInputAttributeDescription *attrs) {
     // Position
-    attrs[0] = (VkVertexInputAttributeDescription){
+    attrs[0] = VkVertexInputAttributeDescription{
         .binding = 0,
         .location = 0,
         .format = VK_FORMAT_R32G32B32_SFLOAT,
@@ -25,7 +25,7 @@ static void get_vertex_attribute_descriptions(VkVertexInputAttributeDescription 
     };
 
     // Color
-    attrs[1] = (VkVertexInputAttributeDescription){
+    attrs[1] = VkVertexInputAttributeDescription{
         .binding = 0,
         .location = 1,
         .format = VK_FORMAT_R32G32B32_SFLOAT,

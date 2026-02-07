@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     LOG_INFO("=== Terrain Simulator ===");
 
     // Create application
-    AppContext app = {0};
+    AppContext app = {};
     AppConfig config = app_config_default();
 
     Result result = app_init(&app, &config);

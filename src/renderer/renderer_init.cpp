@@ -26,6 +26,8 @@ Result renderer_create(Renderer **out_renderer, WindowContext *window,
 
   Result error = RESULT_SUCCESS;
   VkResult vk_result = VK_SUCCESS;
+  u32 width = 0;
+  u32 height = 0;
 
   VkInstanceConfig instance_config = {
       .app_name = config->app_name,
@@ -56,8 +58,6 @@ Result renderer_create(Renderer **out_renderer, WindowContext *window,
     goto fail;
   }
 
-  u32 width = 0;
-  u32 height = 0;
   window_get_framebuffer_size(window, &width, &height);
 
   vk_result = vk_swapchain_create(&renderer->device, renderer->surface, width,

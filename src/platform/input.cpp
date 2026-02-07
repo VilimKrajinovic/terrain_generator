@@ -17,7 +17,7 @@ typedef struct InputState {
     f64 scroll_y;
 } InputState;
 
-static InputState g_input = {0};
+static InputState g_input = {};
 static u32 g_window_id = 0;
 
 static bool input_event_matches_window(const SDL_Event *event) {

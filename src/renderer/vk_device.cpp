@@ -194,7 +194,7 @@ VkResult vk_device_create(VkInstance instance, VkSurfaceKHR surface, VkDeviceCon
     u32 queue_create_info_count = 0;
 
     // Graphics queue
-    queue_create_infos[queue_create_info_count++] = (VkDeviceQueueCreateInfo){
+    queue_create_infos[queue_create_info_count++] = VkDeviceQueueCreateInfo{
         .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         .queueFamilyIndex = ctx->queue_families.graphics_family,
         .queueCount = 1,
@@ -203,7 +203,7 @@ VkResult vk_device_create(VkInstance instance, VkSurfaceKHR surface, VkDeviceCon
 
     // Present queue (if different family)
     if (ctx->queue_families.present_family != ctx->queue_families.graphics_family) {
-        queue_create_infos[queue_create_info_count++] = (VkDeviceQueueCreateInfo){
+        queue_create_infos[queue_create_info_count++] = VkDeviceQueueCreateInfo{
             .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
             .queueFamilyIndex = ctx->queue_families.present_family,
             .queueCount = 1,
@@ -212,7 +212,7 @@ VkResult vk_device_create(VkInstance instance, VkSurfaceKHR surface, VkDeviceCon
     }
 
     // Device features
-    VkPhysicalDeviceFeatures device_features = {0};
+    VkPhysicalDeviceFeatures device_features = {};
 
     // Create logical device
     VkDeviceCreateInfo create_info = {

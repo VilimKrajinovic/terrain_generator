@@ -5,7 +5,7 @@
 #include <string.h>
 
 SwapchainSupportDetails vk_swapchain_query_support(VkPhysicalDevice device, VkSurfaceKHR surface, Arena *arena) {
-    SwapchainSupportDetails details = {0};
+    SwapchainSupportDetails details = {};
 
     // Get capabilities
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);

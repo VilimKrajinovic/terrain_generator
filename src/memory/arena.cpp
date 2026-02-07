@@ -6,7 +6,7 @@
 
 // Global scratch arena (single-thread only; do not use concurrently).
 // TODO (multi-thread): use thread-local scratch arenas or add locking to avoid races/corruption.
-static Arena g_scratch_storage = {0};
+static Arena g_scratch_storage = {};
 static Arena *g_scratch_arena = NULL;
 
 static bool arena_add_overflow(size_t a, size_t b, size_t *out) {
@@ -22,7 +22,7 @@ static bool arena_is_power_of_two(size_t value) {
 }
 
 Arena arena_create(size_t size) {
-    Arena arena = {0};
+    Arena arena = {};
     arena.base = (u8 *)malloc(size);
     if (arena.base) {
         arena.size = size;
@@ -83,7 +83,7 @@ void *arena_alloc_aligned(Arena *arena, size_t size, size_t alignment) {
 }
 
 ArenaTemp arena_temp_begin(Arena *arena) {
-    return (ArenaTemp){
+    return ArenaTemp{
         .arena = arena,
         .pos = arena->pos,
     };
@@ -116,7 +116,7 @@ void arena_scratch_shutdown(void) {
 ArenaTemp arena_scratch_begin(void) {
     if (!g_scratch_arena || !g_scratch_arena->base) {
         LOG_ERROR("Scratch arena not initialized");
-        return (ArenaTemp){0};
+        return ArenaTemp{};
     }
     return arena_temp_begin(g_scratch_arena);
 }

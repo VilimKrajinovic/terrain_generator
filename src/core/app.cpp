@@ -7,7 +7,7 @@
 #include <SDL3/SDL_timer.h>
 
 AppConfig app_config_default(void) {
-  return (AppConfig){
+  return AppConfig{
       .name = "Terrain Simulator",
       .window_width = 1280,
       .window_height = 720,
@@ -21,7 +21,7 @@ Result app_init(AppContext *app, const AppConfig *config) {
   app->config = *config;
   app->state = APP_STATE_UNINITIALIZED;
   app->renderer = NULL;
-  app->simulation = (SimulationState){0};
+  app->simulation = SimulationState{};
   app->delta_time = 0.0;
   app->total_time = 0.0;
   app->frame_count = 0;
@@ -54,7 +54,7 @@ Result app_init(AppContext *app, const AppConfig *config) {
   input_attach_window(app->window.window_id);
 
   // Initialize memory arenas
-  app->memory = (MemoryContext){0};
+  app->memory = MemoryContext{};
   MemoryConfig memory_config = {
       .permanent_size = MEGABYTES(64),
       .transient_size = MEGABYTES(32),

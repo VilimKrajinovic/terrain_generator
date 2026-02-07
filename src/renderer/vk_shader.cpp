@@ -42,7 +42,7 @@ void vk_shader_destroy(VkDevice device, VkShaderModule module) {
 }
 
 VkPipelineShaderStageCreateInfo vk_shader_stage_info(VkShaderStageFlagBits stage, VkShaderModule module) {
-    return (VkPipelineShaderStageCreateInfo){
+    return VkPipelineShaderStageCreateInfo{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = stage,
         .module = module,

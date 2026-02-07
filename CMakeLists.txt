@@ -1,23 +1,16 @@
 cmake_minimum_required(VERSION 3.20)
-project(terrain_sim VERSION 1.0.0 LANGUAGES C)
+project(terrain_sim VERSION 1.0.0 LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Build type
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
-endif()
-
-# Compiler flags
-if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-g -O0)
-  else()
-    add_compile_options(-O2)
-  endif()
 endif()
 
 # Find Vulkan
@@ -34,36 +27,36 @@ endif()
 
 # Source files
 set(SOURCES
-    src/main.c
+    src/main.cpp
     # Core
-    src/core/app.c
-    src/core/log.c
+    src/core/app.cpp
+    src/core/log.cpp
     # Platform
-    src/platform/window.c
-    src/platform/input.c
+    src/platform/window.cpp
+    src/platform/input.cpp
     # Renderer
-    src/renderer/renderer_init.c
-    src/renderer/renderer_frame.c
-    src/renderer/renderer_swapchain.c
-    src/renderer/vk_instance.c
-    src/renderer/vk_device.c
-    src/renderer/vk_swapchain.c
-    src/renderer/vk_sync.c
-    src/renderer/vk_command.c
-    src/renderer/vk_shader.c
-    src/renderer/vk_renderpass.c
-    src/renderer/vk_pipeline.c
-    src/renderer/vk_buffer.c
+    src/renderer/renderer_init.cpp
+    src/renderer/renderer_frame.cpp
+    src/renderer/renderer_swapchain.cpp
+    src/renderer/vk_instance.cpp
+    src/renderer/vk_device.cpp
+    src/renderer/vk_swapchain.cpp
+    src/renderer/vk_sync.cpp
+    src/renderer/vk_command.cpp
+    src/renderer/vk_shader.cpp
+    src/renderer/vk_renderpass.cpp
+    src/renderer/vk_pipeline.cpp
+    src/renderer/vk_buffer.cpp
     # Geometry
-    src/geometry/mesh.c
-    src/geometry/quad.c
+    src/geometry/mesh.cpp
+    src/geometry/quad.cpp
     # Simulation
-    src/simulation/simulation.c
+    src/simulation/simulation.cpp
     # Utils
-    src/utils/file_io.c
+    src/utils/file_io.cpp
     # Memory
-    src/memory/arena.c
-    src/memory/memory.c
+    src/memory/arena.cpp
+    src/memory/memory.cpp
     # Third party
     third_party/stb_impl.c
 )
@@ -71,16 +64,32 @@ set(SOURCES
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+# Compiler flags
+target_compile_options(${PROJECT_NAME} PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+    $<$<COMPILE_LANGUAGE:CXX>:-Werror>
+    $<$<CONFIG:Debug>:-g;-O0>
+    $<$<NOT:$<CONFIG:Debug>>:-O2>
+)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(${PROJECT_NAME} PRIVATE
+      $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions;-fno-rtti>
+  )
+endif()
+
 # Include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb
-    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/cglb/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm/include
     ${Vulkan_INCLUDE_DIRS}
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    CGLM_FORCE_DEPTH_ZERO_TO_ONE
+    GLM_FORCE_DEPTH_ZERO_TO_ONE
 )
 
 # Link libraries

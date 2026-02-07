@@ -23,25 +23,25 @@ void quad_create_colored_arena(Mesh *mesh, const f32 colors[4][3], Arena *arena)
 
     // Define vertices (centered quad, size ~0.8 for visibility)
     // Top-left
-    mesh->vertices[0] = (Vertex){
+    mesh->vertices[0] = Vertex{
         .position = {-0.5f, -0.5f, 0.0f},
         .color = {colors[0][0], colors[0][1], colors[0][2]},
     };
 
     // Top-right
-    mesh->vertices[1] = (Vertex){
+    mesh->vertices[1] = Vertex{
         .position = {0.5f, -0.5f, 0.0f},
         .color = {colors[1][0], colors[1][1], colors[1][2]},
     };
 
     // Bottom-right
-    mesh->vertices[2] = (Vertex){
+    mesh->vertices[2] = Vertex{
         .position = {0.5f, 0.5f, 0.0f},
         .color = {colors[2][0], colors[2][1], colors[2][2]},
     };
 
     // Bottom-left
-    mesh->vertices[3] = (Vertex){
+    mesh->vertices[3] = Vertex{
         .position = {-0.5f, 0.5f, 0.0f},
         .color = {colors[3][0], colors[3][1], colors[3][2]},
     };

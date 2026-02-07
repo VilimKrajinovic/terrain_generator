@@ -47,7 +47,7 @@ static void window_handle_event(WindowContext *ctx, const SDL_Event *event) {
 }
 
 WindowConfig window_config_default(void) {
-  return (WindowConfig){
+  return WindowConfig{
       .title = "Terrain Simulator",
       .width = 1280,
       .height = 720,

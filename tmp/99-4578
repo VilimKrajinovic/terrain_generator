@@ -1,0 +1,9 @@
+vec3 translate_vector(vec3 l, vec3 r){
+    vec3 result = {
+        l[0] + r[0],
+        l[1] + r[1],
+        l[2] + r[2]
+    };
+
+    return result;
+}

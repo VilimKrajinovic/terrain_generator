@@ -4,11 +4,17 @@
 #include "utils/types.h"
 #include <stddef.h>
 
+#ifdef __cplusplus
+#define ALIGNOF_TYPE(type) alignof(type)
+#else
+#define ALIGNOF_TYPE(type) _Alignof(type)
+#endif
+
 // Memory arena for fast bump allocation
 typedef struct Arena {
-    u8 *base;       // Base pointer
-    size_t size;    // Total size
-    size_t pos;     // Current position
+    u8 *base;
+    size_t size;
+    size_t pos;
 } Arena;
 
 // Temporary arena scope for restoring position
@@ -42,9 +48,9 @@ Arena *arena_scratch_get(void);
 
 // Helper macros for typed allocation
 #define ARENA_PUSH_STRUCT(arena, type) \
-    ((type *)arena_alloc_aligned((arena), sizeof(type), _Alignof(type)))
+    ((type *)arena_alloc_aligned((arena), sizeof(type), ALIGNOF_TYPE(type)))
 
 #define ARENA_PUSH_ARRAY(arena, type, count) \
-    ((type *)arena_alloc_aligned((arena), sizeof(type) * (count), _Alignof(type)))
+    ((type *)arena_alloc_aligned((arena), sizeof(type) * (count), ALIGNOF_TYPE(type)))
 
 #endif // ARENA_H

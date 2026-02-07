@@ -1,11 +1,11 @@
 # Terrain Simulator
 
-A Vulkan-based terrain simulation application written in C.
+A Vulkan-based terrain simulation application written in C++20 with a C-style procedural architecture.
 
 ## Requirements
 
 - CMake 3.20+
-- C11 compiler (Clang or GCC)
+- C++20 compiler (Clang or GCC)
 - Vulkan SDK
 - SDL3
 
@@ -55,6 +55,14 @@ Or manually:
 
 Press `ESC` to exit the application.
 
+## C++ Runtime Policy
+
+The codebase stays C-style in C++:
+
+- Procedural APIs and plain structs (no OOP redesign required)
+- `Result`/error-code flow for failures
+- Exceptions and RTTI disabled in build flags
+
 ## Project Structure
 
 ```
@@ -65,18 +73,18 @@ src/
 ├── memory/         # Arena allocator and memory lifetimes
 ├── platform/       # Platform abstraction (window, input)
 ├── renderer/       # Vulkan renderer
-│   ├── renderer_init.c     # Renderer setup and teardown
-│   ├── renderer_frame.c    # Per-frame rendering path
-│   ├── renderer_swapchain.c# Swapchain/framebuffer lifecycle
-│   ├── vk_instance.c   # Vulkan instance
-│   ├── vk_device.c     # Device selection
-│   ├── vk_swapchain.c  # Swapchain management
-│   ├── vk_pipeline.c   # Graphics pipeline
-│   ├── vk_shader.c     # Shader loading
+│   ├── renderer_init.cpp     # Renderer setup and teardown
+│   ├── renderer_frame.cpp    # Per-frame rendering path
+│   ├── renderer_swapchain.cpp# Swapchain/framebuffer lifecycle
+│   ├── vk_instance.cpp   # Vulkan instance
+│   ├── vk_device.cpp     # Device selection
+│   ├── vk_swapchain.cpp  # Swapchain management
+│   ├── vk_pipeline.cpp   # Graphics pipeline
+│   ├── vk_shader.cpp     # Shader loading
 │   └── ...
 ├── simulation/     # Simulation lifecycle (init/update/shutdown)
 ├── utils/          # Utilities (types, macros, file I/O)
-└── main.c          # Entry point
+└── main.cpp        # Entry point
 shaders/
 ├── basic.vert      # Vertex shader
 └── basic.frag      # Fragment shader
