@@ -3,8 +3,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-u8 *file_read_binary_arena(const char *path, size_t *out_size, Arena *arena)
-{
+u8 *file_read_binary_arena(const char *path, size_t *out_size, Arena *arena) {
   FILE *file = fopen(path, "rb");
   if(!file) {
     LOG_ERROR("Failed to open file: %s", path);
@@ -27,8 +26,7 @@ u8 *file_read_binary_arena(const char *path, size_t *out_size, Arena *arena)
   // Read file
   size_t read = fread(buffer, 1, size, file);
   if(read != size) {
-    LOG_ERROR(
-      "Failed to read file: %s (read %zu of %zu bytes)", path, read, size);
+    LOG_ERROR("Failed to read file: %s (read %zu of %zu bytes)", path, read, size);
     fclose(file);
     return NULL;
   }
@@ -43,8 +41,7 @@ u8 *file_read_binary_arena(const char *path, size_t *out_size, Arena *arena)
   return buffer;
 }
 
-char *file_read_text_arena(const char *path, size_t *out_size, Arena *arena)
-{
+char *file_read_text_arena(const char *path, size_t *out_size, Arena *arena) {
   FILE *file = fopen(path, "r");
   if(!file) {
     LOG_ERROR("Failed to open file: %s", path);
@@ -78,14 +75,12 @@ char *file_read_text_arena(const char *path, size_t *out_size, Arena *arena)
   return buffer;
 }
 
-bool file_exists(const char *path)
-{
+bool file_exists(const char *path) {
   struct stat st;
   return stat(path, &st) == 0;
 }
 
-size_t file_get_size(const char *path)
-{
+size_t file_get_size(const char *path) {
   struct stat st;
   if(stat(path, &st) != 0) {
     return 0;

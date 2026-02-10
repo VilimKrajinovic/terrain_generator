@@ -4,8 +4,7 @@
 
 void mesh_init(Mesh *mesh) { memset(mesh, 0, sizeof(Mesh)); }
 
-bool mesh_allocate(Mesh *mesh, u32 vertex_count, u32 index_count, Arena *arena)
-{
+bool mesh_allocate(Mesh *mesh, u32 vertex_count, u32 index_count, Arena *arena) {
   mesh_init(mesh);
 
   mesh->vertices = ARENA_PUSH_ARRAY(arena, Vertex, vertex_count);

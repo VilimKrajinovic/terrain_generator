@@ -20,8 +20,7 @@ typedef struct InputState {
 static InputState g_input     = {};
 static u32        g_window_id = 0;
 
-static bool input_event_matches_window(const SDL_Event *event)
-{
+static bool input_event_matches_window(const SDL_Event *event) {
   if(!g_window_id) {
     return true;
   }
@@ -37,8 +36,7 @@ static bool input_event_matches_window(const SDL_Event *event)
   }
 }
 
-static i32 mouse_button_to_index(Uint8 button)
-{
+static i32 mouse_button_to_index(Uint8 button) {
   switch(button) {
   case SDL_BUTTON_LEFT: return MOUSE_BUTTON_LEFT;
   case SDL_BUTTON_MIDDLE: return MOUSE_BUTTON_MIDDLE;
@@ -47,8 +45,7 @@ static i32 mouse_button_to_index(Uint8 button)
   }
 }
 
-void input_init(void)
-{
+void input_init(void) {
   memset(&g_input, 0, sizeof(g_input));
   g_window_id = 0;
 
@@ -63,21 +60,17 @@ void input_init(void)
 
 void input_attach_window(u32 window_id) { g_window_id = window_id; }
 
-void input_update(void)
-{
+void input_update(void) {
   // Store previous state
   memcpy(g_input.keys_previous, g_input.keys, sizeof(g_input.keys));
-  memcpy(
-    g_input.mouse_buttons_previous, g_input.mouse_buttons,
-    sizeof(g_input.mouse_buttons));
+  memcpy(g_input.mouse_buttons_previous, g_input.mouse_buttons, sizeof(g_input.mouse_buttons));
 
   // Reset delta
   g_input.mouse_dx = 0.0;
   g_input.mouse_dy = 0.0;
 }
 
-void input_handle_event(const SDL_Event *event)
-{
+void input_handle_event(const SDL_Event *event) {
   if(!input_event_matches_window(event)) {
     return;
   }
@@ -119,59 +112,42 @@ void input_handle_event(const SDL_Event *event)
 
 bool input_key_down(KeyCode key) { return g_input.keys[key]; }
 
-bool input_key_pressed(KeyCode key)
-{
-  return g_input.keys[key] && !g_input.keys_previous[key];
+bool input_key_pressed(KeyCode key) { return g_input.keys[key] && !g_input.keys_previous[key]; }
+
+bool input_key_released(KeyCode key) { return !g_input.keys[key] && g_input.keys_previous[key]; }
+
+bool input_mouse_down(MouseButton button) { return g_input.mouse_buttons[button]; }
+
+bool input_mouse_pressed(MouseButton button) {
+  return g_input.mouse_buttons[button] && !g_input.mouse_buttons_previous[button];
 }
 
-bool input_key_released(KeyCode key)
-{
-  return !g_input.keys[key] && g_input.keys_previous[key];
+bool input_mouse_released(MouseButton button) {
+  return !g_input.mouse_buttons[button] && g_input.mouse_buttons_previous[button];
 }
 
-bool input_mouse_down(MouseButton button)
-{
-  return g_input.mouse_buttons[button];
-}
-
-bool input_mouse_pressed(MouseButton button)
-{
-  return g_input.mouse_buttons[button]
-         && !g_input.mouse_buttons_previous[button];
-}
-
-bool input_mouse_released(MouseButton button)
-{
-  return !g_input.mouse_buttons[button]
-         && g_input.mouse_buttons_previous[button];
-}
-
-void input_get_mouse_position(f64 *x, f64 *y)
-{
+void input_get_mouse_position(f64 *x, f64 *y) {
   if(x)
     *x = g_input.mouse_x;
   if(y)
     *y = g_input.mouse_y;
 }
 
-void input_get_mouse_delta(f64 *dx, f64 *dy)
-{
+void input_get_mouse_delta(f64 *dx, f64 *dy) {
   if(dx)
     *dx = g_input.mouse_dx;
   if(dy)
     *dy = g_input.mouse_dy;
 }
 
-void input_get_scroll(f64 *x, f64 *y)
-{
+void input_get_scroll(f64 *x, f64 *y) {
   if(x)
     *x = g_input.scroll_x;
   if(y)
     *y = g_input.scroll_y;
 }
 
-void input_reset_scroll(void)
-{
+void input_reset_scroll(void) {
   g_input.scroll_x = 0.0;
   g_input.scroll_y = 0.0;
 }

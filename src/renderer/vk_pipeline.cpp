@@ -6,8 +6,7 @@
 #include <string.h>
 
 // Get vertex binding description
-static VkVertexInputBindingDescription get_vertex_binding_description(void)
-{
+static VkVertexInputBindingDescription get_vertex_binding_description(void) {
   return VkVertexInputBindingDescription{
     .binding   = 0,
     .stride    = sizeof(Vertex),
@@ -16,9 +15,7 @@ static VkVertexInputBindingDescription get_vertex_binding_description(void)
 }
 
 // Get vertex attribute descriptions
-static void
-get_vertex_attribute_descriptions(VkVertexInputAttributeDescription *attrs)
-{
+static void get_vertex_attribute_descriptions(VkVertexInputAttributeDescription *attrs) {
   // Position
   attrs[0] = VkVertexInputAttributeDescription{
     .binding  = 0,
@@ -36,10 +33,7 @@ get_vertex_attribute_descriptions(VkVertexInputAttributeDescription *attrs)
   };
 }
 
-VkResult vk_pipeline_create(
-  VkDevice device, VkRenderPass render_pass, VkExtent2D extent,
-  VkPipelineContext *ctx)
-{
+VkResult vk_pipeline_create(VkDevice device, VkRenderPass render_pass, VkExtent2D extent, VkPipelineContext *ctx) {
   (void)extent; // Currently unused, will be used for non-dynamic viewport
   LOG_INFO("Creating graphics pipeline");
 
@@ -48,8 +42,7 @@ VkResult vk_pipeline_create(
   // Load shaders
   VkShaderModule vert_module, frag_module;
 
-  VkResult result
-    = vk_shader_load(device, "shaders/basic.vert.spv", &vert_module);
+  VkResult result = vk_shader_load(device, "shaders/basic.vert.spv", &vert_module);
   if(result != VK_SUCCESS) {
     return result;
   }
@@ -67,13 +60,12 @@ VkResult vk_pipeline_create(
   };
 
   // Vertex input
-  VkVertexInputBindingDescription binding_desc
-    = get_vertex_binding_description();
+  VkVertexInputBindingDescription   binding_desc = get_vertex_binding_description();
   VkVertexInputAttributeDescription attr_descs[2];
   get_vertex_attribute_descriptions(attr_descs);
 
   VkPipelineVertexInputStateCreateInfo vertex_input_info = {
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+    .sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
     .vertexBindingDescriptionCount   = 1,
     .pVertexBindingDescriptions      = &binding_desc,
     .vertexAttributeDescriptionCount = 2,
@@ -82,8 +74,8 @@ VkResult vk_pipeline_create(
 
   // Input assembly
   VkPipelineInputAssemblyStateCreateInfo input_assembly = {
-    .sType    = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-    .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+    .sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+    .topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
     .primitiveRestartEnable = VK_FALSE,
   };
 
@@ -96,7 +88,7 @@ VkResult vk_pipeline_create(
 
   // Rasterizer
   VkPipelineRasterizationStateCreateInfo rasterizer = {
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+    .sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
     .depthClampEnable        = VK_FALSE,
     .rasterizerDiscardEnable = VK_FALSE,
     .polygonMode             = VK_POLYGON_MODE_FILL,
@@ -108,21 +100,21 @@ VkResult vk_pipeline_create(
 
   // Multisampling
   VkPipelineMultisampleStateCreateInfo multisampling = {
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+    .sType                = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
     .sampleShadingEnable  = VK_FALSE,
     .rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
   };
 
   // Color blending
   VkPipelineColorBlendAttachmentState color_blend_attachment = {
-    .colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT
-                      | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
+    .colorWriteMask
+    = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
     .blendEnable = VK_FALSE,
   };
 
   VkPipelineColorBlendStateCreateInfo color_blending = {
-    .sType         = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-    .logicOpEnable = VK_FALSE,
+    .sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+    .logicOpEnable   = VK_FALSE,
     .attachmentCount = 1,
     .pAttachments    = &color_blend_attachment,
   };
@@ -174,8 +166,7 @@ VkResult vk_pipeline_create(
     .basePipelineIndex   = -1,
   };
 
-  result = vkCreateGraphicsPipelines(
-    device, VK_NULL_HANDLE, 1, &pipeline_info, NULL, &ctx->pipeline);
+  result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_info, NULL, &ctx->pipeline);
 
   // Cleanup shaders (no longer needed after pipeline creation)
   vk_shader_destroy(device, vert_module);
@@ -191,8 +182,7 @@ VkResult vk_pipeline_create(
   return VK_SUCCESS;
 }
 
-void vk_pipeline_destroy(VkDevice device, VkPipelineContext *ctx)
-{
+void vk_pipeline_destroy(VkDevice device, VkPipelineContext *ctx) {
   if(ctx->pipeline != VK_NULL_HANDLE) {
     vkDestroyPipeline(device, ctx->pipeline, NULL);
   }

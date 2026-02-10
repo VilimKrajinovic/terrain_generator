@@ -21,8 +21,7 @@ static const char *level_colors[] = {
 
 static const char *color_reset = "\033[0m";
 
-void log_init(LogLevel min_level)
-{
+void log_init(LogLevel min_level) {
   g_min_level = min_level;
   LOG_INFO("Logging system initialized");
 }
@@ -33,9 +32,7 @@ void log_set_level(LogLevel level) { g_min_level = level; }
 
 LogLevel log_get_level(void) { return g_min_level; }
 
-void log_output(
-  LogLevel level, const char *file, int line, const char *fmt, ...)
-{
+void log_output(LogLevel level, const char *file, int line, const char *fmt, ...) {
   if(level < g_min_level) {
     return;
   }
@@ -54,8 +51,7 @@ void log_output(
   FILE *out = (level >= LOG_LEVEL_WARN) ? stderr : stdout;
 
   fprintf(
-    out, "%s[%s][%s]%s %s:%d: ", level_colors[level], time_buf,
-    level_strings[level], color_reset, filename, line);
+    out, "%s[%s][%s]%s %s:%d: ", level_colors[level], time_buf, level_strings[level], color_reset, filename, line);
 
   va_list args;
   va_start(args, fmt);

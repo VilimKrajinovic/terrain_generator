@@ -3,9 +3,7 @@
 #include "utils/file_io.h"
 #include "memory/arena.h"
 
-VkResult
-vk_shader_load(VkDevice device, const char *path, VkShaderModule *module)
-{
+VkResult vk_shader_load(VkDevice device, const char *path, VkShaderModule *module) {
   LOG_DEBUG("Loading shader: %s", path);
 
   // Read SPIR-V file using scratch arena
@@ -37,16 +35,13 @@ vk_shader_load(VkDevice device, const char *path, VkShaderModule *module)
   return VK_SUCCESS;
 }
 
-void vk_shader_destroy(VkDevice device, VkShaderModule module)
-{
+void vk_shader_destroy(VkDevice device, VkShaderModule module) {
   if(module != VK_NULL_HANDLE) {
     vkDestroyShaderModule(device, module, NULL);
   }
 }
 
-VkPipelineShaderStageCreateInfo
-vk_shader_stage_info(VkShaderStageFlagBits stage, VkShaderModule module)
-{
+VkPipelineShaderStageCreateInfo vk_shader_stage_info(VkShaderStageFlagBits stage, VkShaderModule module) {
   return VkPipelineShaderStageCreateInfo{
     .sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
     .stage               = stage,

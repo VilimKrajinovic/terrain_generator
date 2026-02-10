@@ -25,22 +25,19 @@ typedef struct VkDeviceContext {
 } VkDeviceContext;
 
 // Create device (selects physical device and creates logical device)
-VkResult vk_device_create(
-  VkInstance instance, VkSurfaceKHR surface, VkDeviceContext *ctx);
+VkResult vk_device_create(VkInstance instance, VkSurfaceKHR surface, VkDeviceContext *ctx);
 
 // Destroy device
 void vk_device_destroy(VkDeviceContext *ctx);
 
 // Find queue families
-QueueFamilyIndices
-vk_device_find_queue_families(VkPhysicalDevice device, VkSurfaceKHR surface);
+QueueFamilyIndices vk_device_find_queue_families(VkPhysicalDevice device, VkSurfaceKHR surface);
 
 // Check if queue families are complete
 bool vk_device_queue_families_complete(const QueueFamilyIndices *indices);
 
 // Find memory type
-u32 vk_device_find_memory_type(
-  VkDeviceContext *ctx, u32 type_filter, VkMemoryPropertyFlags properties);
+u32 vk_device_find_memory_type(VkDeviceContext *ctx, u32 type_filter, VkMemoryPropertyFlags properties);
 
 // Wait for device idle
 void vk_device_wait_idle(VkDeviceContext *ctx);

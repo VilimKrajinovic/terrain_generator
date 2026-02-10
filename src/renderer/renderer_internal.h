@@ -38,8 +38,7 @@ struct Renderer {
 
 VkResult renderer_internal_create_framebuffers(Renderer *renderer);
 void     renderer_internal_destroy_framebuffers(Renderer *renderer);
-VkResult
-renderer_internal_recreate_swapchain(Renderer *renderer, u32 width, u32 height);
+VkResult renderer_internal_recreate_swapchain(Renderer *renderer, u32 width, u32 height);
 
 VkResult renderer_internal_create_render_finished(Renderer *renderer);
 void     renderer_internal_destroy_render_finished(Renderer *renderer);

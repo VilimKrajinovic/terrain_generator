@@ -4,8 +4,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 
-static void window_update_size(WindowContext *ctx)
-{
+static void window_update_size(WindowContext *ctx) {
   int width  = 0;
   int height = 0;
   SDL_GetWindowSizeInPixels(ctx->handle, &width, &height);
@@ -14,8 +13,7 @@ static void window_update_size(WindowContext *ctx)
   ctx->minimized = (width == 0 || height == 0);
 }
 
-static void window_handle_event(WindowContext *ctx, const SDL_Event *event)
-{
+static void window_handle_event(WindowContext *ctx, const SDL_Event *event) {
   switch(event->type) {
   case SDL_EVENT_QUIT: ctx->should_close = true; break;
   case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
@@ -45,8 +43,7 @@ static void window_handle_event(WindowContext *ctx, const SDL_Event *event)
   }
 }
 
-WindowConfig window_config_default(void)
-{
+WindowConfig window_config_default(void) {
   return WindowConfig{
     .title      = "Terrain Simulator",
     .width      = 1280,
@@ -56,8 +53,7 @@ WindowConfig window_config_default(void)
   };
 }
 
-Result window_system_init(void)
-{
+Result window_system_init(void) {
   if(!SDL_Init(SDL_INIT_VIDEO)) {
     LOG_ERROR("Failed to initialize SDL: %s", SDL_GetError());
     return RESULT_ERROR_WINDOW;
@@ -67,14 +63,12 @@ Result window_system_init(void)
   return RESULT_SUCCESS;
 }
 
-void window_system_shutdown(void)
-{
+void window_system_shutdown(void) {
   SDL_Quit();
   LOG_INFO("SDL shut down");
 }
 
-Result window_create(const WindowConfig *config, WindowContext *ctx)
-{
+Result window_create(const WindowConfig *config, WindowContext *ctx) {
   Uint32 flags = SDL_WINDOW_VULKAN;
   if(config->resizable) {
     flags |= SDL_WINDOW_RESIZABLE;
@@ -83,8 +77,7 @@ Result window_create(const WindowConfig *config, WindowContext *ctx)
     flags |= SDL_WINDOW_FULLSCREEN;
   }
 
-  ctx->handle = SDL_CreateWindow(
-    config->title, (int)config->width, (int)config->height, flags);
+  ctx->handle = SDL_CreateWindow(config->title, (int)config->width, (int)config->height, flags);
   if(!ctx->handle) {
     LOG_ERROR("Failed to create SDL window: %s", SDL_GetError());
     return RESULT_ERROR_WINDOW;
@@ -98,13 +91,11 @@ Result window_create(const WindowConfig *config, WindowContext *ctx)
   ctx->minimized    = false;
   ctx->should_close = false;
 
-  LOG_INFO(
-    "Window created: %s (%ux%u)", config->title, ctx->width, ctx->height);
+  LOG_INFO("Window created: %s (%ux%u)", config->title, ctx->width, ctx->height);
   return RESULT_SUCCESS;
 }
 
-void window_destroy(WindowContext *ctx)
-{
+void window_destroy(WindowContext *ctx) {
   if(ctx->handle) {
     SDL_DestroyWindow(ctx->handle);
     ctx->handle       = NULL;
@@ -115,8 +106,7 @@ void window_destroy(WindowContext *ctx)
 
 bool window_should_close(WindowContext *ctx) { return ctx->should_close; }
 
-bool window_poll_event(WindowContext *ctx, SDL_Event *event)
-{
+bool window_poll_event(WindowContext *ctx, SDL_Event *event) {
   if(!event) {
     return false;
   }
@@ -129,8 +119,7 @@ bool window_poll_event(WindowContext *ctx, SDL_Event *event)
   return true;
 }
 
-bool window_wait_event(WindowContext *ctx, SDL_Event *event)
-{
+bool window_wait_event(WindowContext *ctx, SDL_Event *event) {
   if(!event) {
     return false;
   }
@@ -143,8 +132,7 @@ bool window_wait_event(WindowContext *ctx, SDL_Event *event)
   return true;
 }
 
-void window_get_framebuffer_size(WindowContext *ctx, u32 *width, u32 *height)
-{
+void window_get_framebuffer_size(WindowContext *ctx, u32 *width, u32 *height) {
   int w, h;
   SDL_GetWindowSizeInPixels(ctx->handle, &w, &h);
   if(width) {
@@ -155,9 +143,7 @@ void window_get_framebuffer_size(WindowContext *ctx, u32 *width, u32 *height)
   }
 }
 
-VkResult window_create_surface(
-  WindowContext *ctx, VkInstance instance, VkSurfaceKHR *surface)
-{
+VkResult window_create_surface(WindowContext *ctx, VkInstance instance, VkSurfaceKHR *surface) {
   if(!SDL_Vulkan_CreateSurface(ctx->handle, instance, NULL, surface)) {
     LOG_ERROR("Failed to create Vulkan surface: %s", SDL_GetError());
     return VK_ERROR_INITIALIZATION_FAILED;
@@ -167,8 +153,7 @@ VkResult window_create_surface(
   return VK_SUCCESS;
 }
 
-const char **window_get_required_extensions(u32 *count)
-{
+const char **window_get_required_extensions(u32 *count) {
   Uint32             sdl_count  = 0;
   const char *const *extensions = SDL_Vulkan_GetInstanceExtensions(&sdl_count);
   if(!extensions) {
@@ -188,8 +173,6 @@ const char **window_get_required_extensions(u32 *count)
 
 void window_reset_resized(WindowContext *ctx) { ctx->resized = false; }
 
-void window_set_user_pointer(WindowContext *ctx, void *user_data)
-{
-  SDL_SetPointerProperty(
-    SDL_GetWindowProperties(ctx->handle), "user_ptr", user_data);
+void window_set_user_pointer(WindowContext *ctx, void *user_data) {
+  SDL_SetPointerProperty(SDL_GetWindowProperties(ctx->handle), "user_ptr", user_data);
 }

@@ -1,13 +1,14 @@
 #include "app.h"
+#include "camera/camera.h"
 #include "core/log.h"
+#include "memory/memory.h"
 #include "platform/input.h"
 #include "renderer/renderer.h"
 #include "utils/macros.h"
 
 #include <SDL3/SDL_timer.h>
 
-AppConfig app_config_default(void)
-{
+AppConfig app_config_default(void) {
   return AppConfig{
     .name              = "Terrain Simulator",
     .window_width      = 1280,
@@ -16,8 +17,7 @@ AppConfig app_config_default(void)
   };
 }
 
-Result app_init(AppContext *app, const AppConfig *config)
-{
+Result app_init(AppContext *app, const AppConfig *config) {
   LOG_INFO("Initializing application: %s", config->name);
 
   app->config      = *config;
@@ -27,6 +27,7 @@ Result app_init(AppContext *app, const AppConfig *config)
   app->delta_time  = 0.0;
   app->total_time  = 0.0;
   app->frame_count = 0;
+  app->camera      = camera_default();
 
   // Initialize window system
   Result result = window_system_init();
@@ -71,8 +72,7 @@ Result app_init(AppContext *app, const AppConfig *config)
     return RESULT_ERROR_OUT_OF_MEMORY;
   }
 
-  result = simulation_init(
-    &app->simulation, memory_arena(&app->memory, MEMORY_ARENA_PERMANENT));
+  result = simulation_init(&app->simulation, memory_arena(&app->memory, MEMORY_ARENA_PERMANENT));
   if(result != RESULT_SUCCESS) {
     LOG_ERROR("Failed to initialize simulation");
     memory_shutdown(&app->memory);
@@ -86,9 +86,7 @@ Result app_init(AppContext *app, const AppConfig *config)
     .enable_validation = config->enable_validation,
   };
 
-  result = renderer_create(
-    &app->renderer, &app->window, &renderer_config,
-    memory_arena(&app->memory, MEMORY_ARENA_PERMANENT));
+  result = renderer_create(&app->renderer, &app->window, &renderer_config, permanent_memory(&app->memory));
   if(result != RESULT_SUCCESS) {
     LOG_ERROR("Failed to initialize renderer");
     simulation_shutdown(&app->simulation);
@@ -103,8 +101,7 @@ Result app_init(AppContext *app, const AppConfig *config)
   return RESULT_SUCCESS;
 }
 
-void app_shutdown(AppContext *app)
-{
+void app_shutdown(AppContext *app) {
   LOG_INFO("Shutting down application");
   app->state = APP_STATE_SHUTTING_DOWN;
 
@@ -124,15 +121,13 @@ void app_shutdown(AppContext *app)
   LOG_INFO("Application shutdown complete");
 }
 
-void app_run(AppContext *app)
-{
+void app_run(AppContext *app) {
   LOG_INFO("Starting main loop");
 
   u64    last_ticks = SDL_GetTicksNS();
   Result result     = RESULT_SUCCESS;
 
-  while(!window_should_close(&app->window)
-        && app->state == APP_STATE_RUNNING) {
+  while(!window_should_close(&app->window) && app->state == APP_STATE_RUNNING) {
     // Calculate delta time
     u64 current_ticks = SDL_GetTicksNS();
     app->delta_time   = (f64)(current_ticks - last_ticks) / 1000000000.0;
@@ -204,13 +199,9 @@ void app_run(AppContext *app)
   LOG_INFO("Main loop ended after %llu frames", app->frame_count);
 }
 
-void app_request_shutdown(AppContext *app)
-{
+void app_request_shutdown(AppContext *app) {
   LOG_INFO("Shutdown requested");
   app->state = APP_STATE_SHUTTING_DOWN;
 }
 
-bool app_is_running(AppContext *app)
-{
-  return app->state == APP_STATE_RUNNING;
-}
+bool app_is_running(AppContext *app) { return app->state == APP_STATE_RUNNING; }

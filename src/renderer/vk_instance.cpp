@@ -10,11 +10,10 @@ static const char *VALIDATION_LAYERS[]    = {"VK_LAYER_KHRONOS_validation"};
 static const u32   VALIDATION_LAYER_COUNT = 1;
 
 // Debug callback
-static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
-  VkDebugUtilsMessageSeverityFlagBitsEXT      severity,
-  VkDebugUtilsMessageTypeFlagsEXT             type,
-  const VkDebugUtilsMessengerCallbackDataEXT *callback_data, void *user_data)
-{
+static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      severity,
+                                                     VkDebugUtilsMessageTypeFlagsEXT             type,
+                                                     const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
+                                                     void                                       *user_data) {
   (void)type;
   (void)user_data;
 
@@ -32,17 +31,13 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
 }
 
 // Create debug messenger
-static VkResult
-create_debug_messenger(VkInstance instance, VkDebugUtilsMessengerEXT *messenger)
-{
+static VkResult create_debug_messenger(VkInstance instance, VkDebugUtilsMessengerEXT *messenger) {
   VkDebugUtilsMessengerCreateInfoEXT create_info = {
     .sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-    .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
-                       | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+    .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
                        | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
                        | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-    .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
-                   | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+    .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
                    | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
     .pfnUserCallback = debug_callback,
     .pUserData       = NULL,
@@ -50,8 +45,7 @@ create_debug_messenger(VkInstance instance, VkDebugUtilsMessengerEXT *messenger)
 
   // Load function
   PFN_vkCreateDebugUtilsMessengerEXT func
-    = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-      instance, "vkCreateDebugUtilsMessengerEXT");
+    = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
 
   if(func) {
     return func(instance, &create_info, NULL, messenger);
@@ -61,26 +55,21 @@ create_debug_messenger(VkInstance instance, VkDebugUtilsMessengerEXT *messenger)
 }
 
 // Destroy debug messenger
-static void
-destroy_debug_messenger(VkInstance instance, VkDebugUtilsMessengerEXT messenger)
-{
+static void destroy_debug_messenger(VkInstance instance, VkDebugUtilsMessengerEXT messenger) {
   PFN_vkDestroyDebugUtilsMessengerEXT func
-    = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-      instance, "vkDestroyDebugUtilsMessengerEXT");
+    = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
 
   if(func) {
     func(instance, messenger, NULL);
   }
 }
 
-bool vk_instance_check_validation_support(void)
-{
+bool vk_instance_check_validation_support(void) {
   u32 layer_count;
   vkEnumerateInstanceLayerProperties(&layer_count, NULL);
 
-  ArenaTemp          scratch = arena_scratch_begin();
-  VkLayerProperties *available_layers
-    = ARENA_PUSH_ARRAY(scratch.arena, VkLayerProperties, layer_count);
+  ArenaTemp          scratch          = arena_scratch_begin();
+  VkLayerProperties *available_layers = ARENA_PUSH_ARRAY(scratch.arena, VkLayerProperties, layer_count);
   if(!available_layers) {
     arena_temp_end(scratch);
     return false;
@@ -107,9 +96,7 @@ bool vk_instance_check_validation_support(void)
   return all_found;
 }
 
-VkResult
-vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx)
-{
+VkResult vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx) {
   LOG_INFO("Creating Vulkan instance");
 
   ctx->instance           = VK_NULL_HANDLE;
@@ -134,8 +121,7 @@ vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx)
 
   // Get required extensions
   u32          window_extension_count = 0;
-  const char **window_extensions
-    = window_get_required_extensions(&window_extension_count);
+  const char **window_extensions      = window_get_required_extensions(&window_extension_count);
   if(!window_extensions || window_extension_count == 0) {
     LOG_ERROR("No window system Vulkan extensions available");
     return VK_ERROR_EXTENSION_NOT_PRESENT;
@@ -144,8 +130,7 @@ vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx)
   // Build extension list using scratch arena
   ArenaTemp    scratch         = arena_scratch_begin();
   u32          extension_count = window_extension_count;
-  const char **extensions
-    = ARENA_PUSH_ARRAY(scratch.arena, const char *, extension_count + 2);
+  const char **extensions      = ARENA_PUSH_ARRAY(scratch.arena, const char *, extension_count + 2);
   if(!extensions) {
     arena_temp_end(scratch);
     return VK_ERROR_OUT_OF_HOST_MEMORY;
@@ -156,8 +141,7 @@ vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx)
   }
 
   // Add portability extension for MoltenVK
-  extensions[extension_count++]
-    = VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME;
+  extensions[extension_count++] = VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME;
 
   if(ctx->validation_enabled) {
     extensions[extension_count++] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
@@ -175,7 +159,7 @@ vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx)
     .pApplicationInfo        = &app_info,
     .enabledExtensionCount   = extension_count,
     .ppEnabledExtensionNames = extensions,
-    .flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR,
+    .flags                   = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR,
   };
 
   if(ctx->validation_enabled) {
@@ -210,8 +194,7 @@ vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx)
   return VK_SUCCESS;
 }
 
-void vk_instance_destroy(VkInstanceContext *ctx)
-{
+void vk_instance_destroy(VkInstanceContext *ctx) {
   if(ctx->debug_messenger != VK_NULL_HANDLE) {
     destroy_debug_messenger(ctx->instance, ctx->debug_messenger);
     LOG_DEBUG("Debug messenger destroyed");

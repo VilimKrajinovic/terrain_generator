@@ -1,8 +1,7 @@
 #include "quad.h"
 #include "core/log.h"
 
-void quad_create_arena(Mesh *mesh, Arena *arena)
-{
+void quad_create_arena(Mesh *mesh, Arena *arena) {
   // Default colors: red, green, blue, yellow
   f32 colors[4][3] = {
     {1.0f, 0.0f, 0.0f}, // Red (top-left)
@@ -14,8 +13,7 @@ void quad_create_arena(Mesh *mesh, Arena *arena)
   quad_create_colored_arena(mesh, colors, arena);
 }
 
-void quad_create_colored_arena(Mesh *mesh, const f32 colors[4][3], Arena *arena)
-{
+void quad_create_colored_arena(Mesh *mesh, const f32 colors[4][3], Arena *arena) {
   LOG_DEBUG("Creating quad mesh");
 
   // Allocate mesh data (4 vertices, 6 indices)
@@ -57,7 +55,5 @@ void quad_create_colored_arena(Mesh *mesh, const f32 colors[4][3], Arena *arena)
   mesh->indices[4] = 3;
   mesh->indices[5] = 0;
 
-  LOG_DEBUG(
-    "Quad mesh created: %u vertices, %u indices", mesh->vertex_count,
-    mesh->index_count);
+  LOG_DEBUG("Quad mesh created: %u vertices, %u indices", mesh->vertex_count, mesh->index_count);
 }

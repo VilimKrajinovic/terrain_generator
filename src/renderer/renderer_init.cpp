@@ -5,10 +5,7 @@
 
 #include <string.h>
 
-Result renderer_create(
-  Renderer **out_renderer, WindowContext *window, const RendererConfig *config,
-  Arena *arena)
-{
+Result renderer_create(Renderer **out_renderer, WindowContext *window, const RendererConfig *config, Arena *arena) {
   if(!out_renderer || !window || !config || !arena) {
     return RESULT_ERROR_GENERIC;
   }
@@ -44,16 +41,14 @@ Result renderer_create(
     goto fail;
   }
 
-  vk_result = window_create_surface(
-    window, renderer->instance.instance, &renderer->surface);
+  vk_result = window_create_surface(window, renderer->instance.instance, &renderer->surface);
   if(vk_result != VK_SUCCESS) {
     LOG_ERROR("Failed to create window surface");
     error = RESULT_ERROR_VULKAN;
     goto fail;
   }
 
-  vk_result = vk_device_create(
-    renderer->instance.instance, renderer->surface, &renderer->device);
+  vk_result = vk_device_create(renderer->instance.instance, renderer->surface, &renderer->device);
   if(vk_result != VK_SUCCESS) {
     LOG_ERROR("Failed to create device");
     error = RESULT_ERROR_VULKAN;
@@ -62,9 +57,8 @@ Result renderer_create(
 
   window_get_framebuffer_size(window, &width, &height);
 
-  vk_result = vk_swapchain_create(
-    &renderer->device, renderer->surface, width, height, VK_NULL_HANDLE,
-    &renderer->swapchain);
+  vk_result
+    = vk_swapchain_create(&renderer->device, renderer->surface, width, height, VK_NULL_HANDLE, &renderer->swapchain);
   if(vk_result != VK_SUCCESS) {
     LOG_ERROR("Failed to create swapchain");
     error = RESULT_ERROR_VULKAN;
@@ -88,9 +82,8 @@ Result renderer_create(
     goto fail;
   }
 
-  vk_result = vk_command_create(
-    renderer->device.device, renderer->device.queue_families.graphics_family,
-    &renderer->command);
+  vk_result
+    = vk_command_create(renderer->device.device, renderer->device.queue_families.graphics_family, &renderer->command);
   if(vk_result != VK_SUCCESS) {
     LOG_ERROR("Failed to create command pool");
     error = RESULT_ERROR_VULKAN;
@@ -104,9 +97,7 @@ Result renderer_create(
     goto fail;
   }
 
-  vk_result = vk_renderpass_create(
-    renderer->device.device, renderer->swapchain.format,
-    renderer->render_pass);
+  vk_result = vk_renderpass_create(renderer->device.device, renderer->swapchain.format, renderer->render_pass);
   if(vk_result != VK_SUCCESS) {
     LOG_ERROR("Failed to create render pass");
     error = RESULT_ERROR_VULKAN;
@@ -121,8 +112,7 @@ Result renderer_create(
   }
 
   vk_result = vk_pipeline_create(
-    renderer->device.device, renderer->render_pass->render_pass,
-    renderer->swapchain.extent, renderer->pipeline);
+    renderer->device.device, renderer->render_pass->render_pass, renderer->swapchain.extent, renderer->pipeline);
   if(vk_result != VK_SUCCESS) {
     LOG_ERROR("Failed to create graphics pipeline");
     error = RESULT_ERROR_VULKAN;
@@ -157,10 +147,11 @@ Result renderer_create(
     goto fail;
   }
 
-  vk_result = vk_buffer_create_vertex(
-    &renderer->device, renderer->command.pool, renderer->quad_mesh->vertices,
-    renderer->quad_mesh->vertex_count * sizeof(Vertex),
-    renderer->vertex_buffer);
+  vk_result = vk_buffer_create_vertex(&renderer->device,
+                                      renderer->command.pool,
+                                      renderer->quad_mesh->vertices,
+                                      renderer->quad_mesh->vertex_count * sizeof(Vertex),
+                                      renderer->vertex_buffer);
   if(vk_result != VK_SUCCESS) {
     LOG_ERROR("Failed to create vertex buffer");
     error = RESULT_ERROR_VULKAN;
@@ -174,9 +165,11 @@ Result renderer_create(
     goto fail;
   }
 
-  vk_result = vk_buffer_create_index(
-    &renderer->device, renderer->command.pool, renderer->quad_mesh->indices,
-    renderer->quad_mesh->index_count * sizeof(u32), renderer->index_buffer);
+  vk_result = vk_buffer_create_index(&renderer->device,
+                                     renderer->command.pool,
+                                     renderer->quad_mesh->indices,
+                                     renderer->quad_mesh->index_count * sizeof(u32),
+                                     renderer->index_buffer);
   if(vk_result != VK_SUCCESS) {
     LOG_ERROR("Failed to create index buffer");
     error = RESULT_ERROR_VULKAN;
@@ -192,8 +185,7 @@ fail:
   return error;
 }
 
-void renderer_destroy(Renderer *renderer)
-{
+void renderer_destroy(Renderer *renderer) {
   if(!renderer) {
     return;
   }
@@ -233,9 +225,7 @@ void renderer_destroy(Renderer *renderer)
     vk_device_destroy(&renderer->device);
   }
 
-  if(
-    renderer->surface != VK_NULL_HANDLE
-    && renderer->instance.instance != VK_NULL_HANDLE) {
+  if(renderer->surface != VK_NULL_HANDLE && renderer->instance.instance != VK_NULL_HANDLE) {
     vkDestroySurfaceKHR(renderer->instance.instance, renderer->surface, NULL);
   }
 

@@ -1,10 +1,9 @@
 #include "vk_command.h"
 #include "core/log.h"
 #include <string.h>
+#include "utils/macros.h"
 
-VkResult vk_command_create(
-  VkDevice device, u32 queue_family_index, VkCommandContext *ctx)
-{
+VkResult vk_command_create(VkDevice device, u32 queue_family_index, VkCommandContext *ctx) {
   LOG_INFO("Creating command pool and buffers");
 
   memset(ctx, 0, sizeof(VkCommandContext));
@@ -12,6 +11,7 @@ VkResult vk_command_create(
   // Create command pool
   VkCommandPoolCreateInfo pool_info = {
     .sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+    .pNext            = VK_NULL_HANDLE,
     .flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
     .queueFamilyIndex = queue_family_index,
   };
@@ -25,6 +25,7 @@ VkResult vk_command_create(
   // Allocate command buffers
   VkCommandBufferAllocateInfo alloc_info = {
     .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+    .pNext              = VK_NULL_HANDLE,
     .commandPool        = ctx->pool,
     .level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
     .commandBufferCount = MAX_FRAMES_IN_FLIGHT,
@@ -41,8 +42,7 @@ VkResult vk_command_create(
   return VK_SUCCESS;
 }
 
-void vk_command_destroy(VkDevice device, VkCommandContext *ctx)
-{
+void vk_command_destroy(VkDevice device, VkCommandContext *ctx) {
   if(ctx->pool != VK_NULL_HANDLE) {
     vkDestroyCommandPool(device, ctx->pool, NULL);
   }
@@ -51,31 +51,22 @@ void vk_command_destroy(VkDevice device, VkCommandContext *ctx)
   memset(ctx, 0, sizeof(VkCommandContext));
 }
 
-VkCommandBuffer vk_command_get_buffer(VkCommandContext *ctx, u32 frame_index)
-{
-  return ctx->buffers[frame_index];
-}
+VkCommandBuffer vk_command_get_buffer(VkCommandContext *ctx, u32 frame_index) { return ctx->buffers[frame_index]; }
 
-VkResult vk_command_begin(VkCommandBuffer buffer)
-{
-  vkResetCommandBuffer(buffer, 0);
-
+// Resets buffer so we can safely begin recording
+VkResult vk_command_begin(VkCommandBuffer buffer, VkCommandBufferUsageFlags flags) {
+  VK_CHECK(vkResetCommandBuffer(buffer, 0));
   VkCommandBufferBeginInfo begin_info = {
     .sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-    .flags            = 0,
+    .flags            = flags,
     .pInheritanceInfo = NULL,
   };
-
   return vkBeginCommandBuffer(buffer, &begin_info);
 }
 
-VkResult vk_command_end(VkCommandBuffer buffer)
-{
-  return vkEndCommandBuffer(buffer);
-}
+VkResult vk_command_end(VkCommandBuffer buffer) { return vkEndCommandBuffer(buffer); }
 
-VkCommandBuffer vk_command_begin_single(VkDevice device, VkCommandPool pool)
-{
+VkCommandBuffer vk_command_begin_single(VkDevice device, VkCommandPool pool) {
   VkCommandBufferAllocateInfo alloc_info = {
     .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
     .commandPool        = pool,
@@ -97,9 +88,7 @@ VkCommandBuffer vk_command_begin_single(VkDevice device, VkCommandPool pool)
   return buffer;
 }
 
-VkResult vk_command_end_single(
-  VkDevice device, VkCommandPool pool, VkQueue queue, VkCommandBuffer buffer)
-{
+VkResult vk_command_end_single(VkDevice device, VkCommandPool pool, VkQueue queue, VkCommandBuffer buffer) {
   vkEndCommandBuffer(buffer);
 
   VkSubmitInfo submit_info = {

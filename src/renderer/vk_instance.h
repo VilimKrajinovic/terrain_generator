@@ -19,8 +19,7 @@ typedef struct VkInstanceContext {
 } VkInstanceContext;
 
 // Create Vulkan instance
-VkResult
-vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx);
+VkResult vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx);
 
 // Destroy Vulkan instance
 void vk_instance_destroy(VkInstanceContext *ctx);

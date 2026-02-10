@@ -6,6 +6,7 @@
 #include "foundation/result.h"
 #include "simulation/simulation.h"
 #include "utils/types.h"
+#include "camera/camera.h"
 
 // Forward declarations
 typedef struct Renderer Renderer;
@@ -33,6 +34,7 @@ typedef struct AppContext {
   MemoryContext   memory;
   WindowContext   window;
   Renderer       *renderer;
+  Camera          camera;
   SimulationState simulation;
   f64             delta_time;
   f64             total_time;

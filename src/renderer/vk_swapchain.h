@@ -29,20 +29,17 @@ typedef struct VkSwapchainContext {
 } VkSwapchainContext;
 
 // Query swapchain support (allocates from arena)
-SwapchainSupportDetails vk_swapchain_query_support(
-  VkPhysicalDevice device, VkSurfaceKHR surface, Arena *arena);
+SwapchainSupportDetails vk_swapchain_query_support(VkPhysicalDevice device, VkSurfaceKHR surface, Arena *arena);
 
 // Create swapchain
-VkResult vk_swapchain_create(
-  VkDeviceContext *device, VkSurfaceKHR surface, u32 width, u32 height,
-  VkSwapchainKHR old_swapchain, VkSwapchainContext *ctx);
+VkResult vk_swapchain_create(VkDeviceContext *device, VkSurfaceKHR surface, u32 width, u32 height,
+                             VkSwapchainKHR old_swapchain, VkSwapchainContext *ctx);
 
 // Destroy swapchain
 void vk_swapchain_destroy(VkDeviceContext *device, VkSwapchainContext *ctx);
 
 // Recreate swapchain (for resize)
-VkResult vk_swapchain_recreate(
-  VkDeviceContext *device, VkSurfaceKHR surface, u32 width, u32 height,
-  VkSwapchainContext *ctx);
+VkResult
+vk_swapchain_recreate(VkDeviceContext *device, VkSurfaceKHR surface, u32 width, u32 height, VkSwapchainContext *ctx);
 
 #endif // VK_SWAPCHAIN_H

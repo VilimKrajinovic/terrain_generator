@@ -1,5 +1,5 @@
 BasedOnStyle: GNU
-AlignAfterOpenBracket: AlwaysBreak
+AlignAfterOpenBracket: true
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortBlocksOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: true
@@ -8,6 +8,8 @@ AlignConsecutiveAssignments: Consecutive
 AlignConsecutiveDeclarations: Consecutive
 AlignConsecutiveBitFields: Consecutive
 AlignConsecutiveMacros: Consecutive
+BinPackArguments: false
+ColumnLimit: 120
 # Uncommenting these lines will sometimes result in lines following an
 # if(){} or for(){} block being attached to the end of the block.
 # AllowShortIfStatementsOnASingleLine: true
@@ -16,14 +18,14 @@ AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 BreakBeforeBraces: Custom
 BraceWrapping:
-  AfterFunction: true
+  AfterFunction: false
 ContinuationIndentWidth: 2
 Cpp11BracedListStyle: true
 KeepEmptyLinesAtTheStartOfBlocks: false
 Language: Cpp
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
-PenaltyExcessCharacter: 100
+PenaltyExcessCharacter: 180
 PenaltyReturnTypeOnItsOwnLine: 1
 PointerAlignment: Right
 SortIncludes: false

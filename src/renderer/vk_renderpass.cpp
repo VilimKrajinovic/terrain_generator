@@ -2,9 +2,7 @@
 #include "core/log.h"
 #include <string.h>
 
-VkResult vk_renderpass_create(
-  VkDevice device, VkFormat color_format, VkRenderPassContext *ctx)
-{
+VkResult vk_renderpass_create(VkDevice device, VkFormat color_format, VkRenderPassContext *ctx) {
   LOG_INFO("Creating render pass");
 
   memset(ctx, 0, sizeof(VkRenderPassContext));
@@ -55,8 +53,7 @@ VkResult vk_renderpass_create(
     .pDependencies   = &dependency,
   };
 
-  VkResult result
-    = vkCreateRenderPass(device, &render_pass_info, NULL, &ctx->render_pass);
+  VkResult result = vkCreateRenderPass(device, &render_pass_info, NULL, &ctx->render_pass);
   if(result != VK_SUCCESS) {
     LOG_ERROR("Failed to create render pass: %d", result);
     return result;
@@ -66,8 +63,7 @@ VkResult vk_renderpass_create(
   return VK_SUCCESS;
 }
 
-void vk_renderpass_destroy(VkDevice device, VkRenderPassContext *ctx)
-{
+void vk_renderpass_destroy(VkDevice device, VkRenderPassContext *ctx) {
   if(ctx->render_pass != VK_NULL_HANDLE) {
     vkDestroyRenderPass(device, ctx->render_pass, NULL);
   }

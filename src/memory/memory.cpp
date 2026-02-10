@@ -2,8 +2,7 @@
 #include "core/log.h"
 #include <string.h>
 
-static bool arena_create_checked(Arena *arena, size_t size)
-{
+static bool arena_create_checked(Arena *arena, size_t size) {
   if(size == 0) {
     memset(arena, 0, sizeof(*arena));
     return true;
@@ -12,34 +11,29 @@ static bool arena_create_checked(Arena *arena, size_t size)
   return arena->base != NULL;
 }
 
-bool memory_init(MemoryContext *memory, const MemoryConfig *config)
-{
+bool memory_init(MemoryContext *memory, const MemoryConfig *config) {
   if(!memory || !config) {
     return false;
   }
 
   memset(memory, 0, sizeof(*memory));
 
-  if(!arena_create_checked(
-       &memory->arenas[MEMORY_ARENA_PERMANENT], config->permanent_size)) {
+  if(!arena_create_checked(&memory->arenas[MEMORY_ARENA_PERMANENT], config->permanent_size)) {
     LOG_ERROR("Failed to create permanent arena");
     goto fail;
   }
 
-  if(!arena_create_checked(
-       &memory->arenas[MEMORY_ARENA_TRANSIENT], config->transient_size)) {
+  if(!arena_create_checked(&memory->arenas[MEMORY_ARENA_TRANSIENT], config->transient_size)) {
     LOG_ERROR("Failed to create transient arena");
     goto fail;
   }
 
-  if(!arena_create_checked(
-       &memory->arenas[MEMORY_ARENA_FRAME], config->frame_size)) {
+  if(!arena_create_checked(&memory->arenas[MEMORY_ARENA_FRAME], config->frame_size)) {
     LOG_ERROR("Failed to create frame arena");
     goto fail;
   }
 
-  if(!arena_create_checked(
-       &memory->arenas[MEMORY_ARENA_SCRATCH], config->scratch_size)) {
+  if(!arena_create_checked(&memory->arenas[MEMORY_ARENA_SCRATCH], config->scratch_size)) {
     LOG_ERROR("Failed to create scratch arena");
     goto fail;
   }
@@ -56,8 +50,7 @@ fail:
   return false;
 }
 
-void memory_shutdown(MemoryContext *memory)
-{
+void memory_shutdown(MemoryContext *memory) {
   if(!memory) {
     return;
   }
@@ -75,16 +68,14 @@ void memory_shutdown(MemoryContext *memory)
   memset(memory, 0, sizeof(*memory));
 }
 
-Arena *memory_arena(MemoryContext *memory, MemoryArenaId id)
-{
+Arena *memory_arena(MemoryContext *memory, MemoryArenaId id) {
   if(!memory || id >= MEMORY_ARENA_COUNT) {
     return NULL;
   }
   return &memory->arenas[id];
 }
 
-void memory_begin_frame(MemoryContext *memory)
-{
+void memory_begin_frame(MemoryContext *memory) {
   if(!memory) {
     return;
   }
@@ -95,8 +86,7 @@ void memory_begin_frame(MemoryContext *memory)
   }
 }
 
-ArenaTemp memory_scratch_begin(MemoryContext *memory)
-{
+ArenaTemp memory_scratch_begin(MemoryContext *memory) {
   if(!memory) {
     return arena_scratch_begin();
   }
@@ -110,32 +100,28 @@ ArenaTemp memory_scratch_begin(MemoryContext *memory)
 }
 
 // If setup, returns the permanent arena pointer
-Arena *permanent_memory(MemoryContext *memory)
-{
+Arena *permanent_memory(MemoryContext *memory) {
   if(!memory) {
     return NULL;
   }
   return &memory->arenas[MEMORY_ARENA_PERMANENT];
 }
 
-Arena *transient_memory(MemoryContext *memory)
-{
+Arena *transient_memory(MemoryContext *memory) {
   if(!memory) {
     return NULL;
   }
   return &memory->arenas[MEMORY_ARENA_TRANSIENT];
 }
 
-Arena *frame_memory(MemoryContext *memory)
-{
+Arena *frame_memory(MemoryContext *memory) {
   if(!memory) {
     return NULL;
   }
   return &memory->arenas[MEMORY_ARENA_FRAME];
 }
 
-Arena *scratch_memory(MemoryContext *memory)
-{
+Arena *scratch_memory(MemoryContext *memory) {
   if(!memory) {
     return NULL;
   }

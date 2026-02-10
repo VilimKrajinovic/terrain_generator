@@ -3,10 +3,8 @@
 #include "core/log.h"
 #include <string.h>
 
-VkResult vk_buffer_create(
-  VkDeviceContext *device, VkDeviceSize size, VkBufferUsageFlags usage,
-  VkMemoryPropertyFlags properties, VkBufferContext *ctx)
-{
+VkResult vk_buffer_create(VkDeviceContext *device, VkDeviceSize size, VkBufferUsageFlags usage,
+                          VkMemoryPropertyFlags properties, VkBufferContext *ctx) {
   memset(ctx, 0, sizeof(VkBufferContext));
   ctx->size = size;
 
@@ -18,8 +16,7 @@ VkResult vk_buffer_create(
     .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
   };
 
-  VkResult result
-    = vkCreateBuffer(device->device, &buffer_info, NULL, &ctx->buffer);
+  VkResult result = vkCreateBuffer(device->device, &buffer_info, NULL, &ctx->buffer);
   if(result != VK_SUCCESS) {
     LOG_ERROR("Failed to create buffer: %d", result);
     return result;
@@ -27,15 +24,13 @@ VkResult vk_buffer_create(
 
   // Get memory requirements
   VkMemoryRequirements mem_requirements;
-  vkGetBufferMemoryRequirements(
-    device->device, ctx->buffer, &mem_requirements);
+  vkGetBufferMemoryRequirements(device->device, ctx->buffer, &mem_requirements);
 
   // Allocate memory
   VkMemoryAllocateInfo alloc_info = {
     .sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
     .allocationSize  = mem_requirements.size,
-    .memoryTypeIndex = vk_device_find_memory_type(
-      device, mem_requirements.memoryTypeBits, properties),
+    .memoryTypeIndex = vk_device_find_memory_type(device, mem_requirements.memoryTypeBits, properties),
   };
 
   if(alloc_info.memoryTypeIndex == UINT32_MAX) {
@@ -62,8 +57,7 @@ VkResult vk_buffer_create(
   return VK_SUCCESS;
 }
 
-void vk_buffer_destroy(VkDevice device, VkBufferContext *ctx)
-{
+void vk_buffer_destroy(VkDevice device, VkBufferContext *ctx) {
   if(ctx->buffer != VK_NULL_HANDLE) {
     vkDestroyBuffer(device, ctx->buffer, NULL);
   }
@@ -73,9 +67,7 @@ void vk_buffer_destroy(VkDevice device, VkBufferContext *ctx)
   memset(ctx, 0, sizeof(VkBufferContext));
 }
 
-VkResult vk_buffer_copy_data(
-  VkDevice device, VkBufferContext *ctx, const void *data, VkDeviceSize size)
-{
+VkResult vk_buffer_copy_data(VkDevice device, VkBufferContext *ctx, const void *data, VkDeviceSize size) {
   void    *mapped;
   VkResult result = vkMapMemory(device, ctx->memory, 0, size, 0, &mapped);
   if(result != VK_SUCCESS) {
@@ -89,10 +81,8 @@ VkResult vk_buffer_copy_data(
   return VK_SUCCESS;
 }
 
-VkResult vk_buffer_copy(
-  VkDeviceContext *device, VkCommandPool pool, VkBufferContext *src,
-  VkBufferContext *dst, VkDeviceSize size)
-{
+VkResult vk_buffer_copy(VkDeviceContext *device, VkCommandPool pool, VkBufferContext *src, VkBufferContext *dst,
+                        VkDeviceSize size) {
   VkCommandBuffer cmd = vk_command_begin_single(device->device, pool);
   if(cmd == VK_NULL_HANDLE) {
     return VK_ERROR_OUT_OF_HOST_MEMORY;
@@ -106,22 +96,20 @@ VkResult vk_buffer_copy(
 
   vkCmdCopyBuffer(cmd, src->buffer, dst->buffer, 1, &copy_region);
 
-  return vk_command_end_single(
-    device->device, pool, device->graphics_queue, cmd);
+  return vk_command_end_single(device->device, pool, device->graphics_queue, cmd);
 }
 
-VkResult vk_buffer_create_vertex(
-  VkDeviceContext *device, VkCommandPool pool, const void *data,
-  VkDeviceSize size, VkBufferContext *ctx)
-{
+VkResult vk_buffer_create_vertex(VkDeviceContext *device, VkCommandPool pool, const void *data, VkDeviceSize size,
+                                 VkBufferContext *ctx) {
   LOG_DEBUG("Creating vertex buffer (%llu bytes)", (unsigned long long)size);
 
   // Create staging buffer
   VkBufferContext staging;
-  VkResult        result = vk_buffer_create(
-    device, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-    &staging);
+  VkResult        result = vk_buffer_create(device,
+                                     size,
+                                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                     &staging);
   if(result != VK_SUCCESS) {
     return result;
   }
@@ -134,10 +122,11 @@ VkResult vk_buffer_create_vertex(
   }
 
   // Create device local buffer
-  result = vk_buffer_create(
-    device, size,
-    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, ctx);
+  result = vk_buffer_create(device,
+                            size,
+                            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                            ctx);
   if(result != VK_SUCCESS) {
     vk_buffer_destroy(device->device, &staging);
     return result;
@@ -156,18 +145,17 @@ VkResult vk_buffer_create_vertex(
   return VK_SUCCESS;
 }
 
-VkResult vk_buffer_create_index(
-  VkDeviceContext *device, VkCommandPool pool, const void *data,
-  VkDeviceSize size, VkBufferContext *ctx)
-{
+VkResult vk_buffer_create_index(VkDeviceContext *device, VkCommandPool pool, const void *data, VkDeviceSize size,
+                                VkBufferContext *ctx) {
   LOG_DEBUG("Creating index buffer (%llu bytes)", (unsigned long long)size);
 
   // Create staging buffer
   VkBufferContext staging;
-  VkResult        result = vk_buffer_create(
-    device, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-    &staging);
+  VkResult        result = vk_buffer_create(device,
+                                     size,
+                                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                     &staging);
   if(result != VK_SUCCESS) {
     return result;
   }
@@ -180,10 +168,11 @@ VkResult vk_buffer_create_index(
   }
 
   // Create device local buffer
-  result = vk_buffer_create(
-    device, size,
-    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, ctx);
+  result = vk_buffer_create(device,
+                            size,
+                            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                            ctx);
   if(result != VK_SUCCESS) {
     vk_buffer_destroy(device->device, &staging);
     return result;

@@ -1,9 +1,9 @@
 #include "vk_sync.h"
 #include "core/log.h"
+#include "utils/macros.h"
 #include <string.h>
 
-VkResult vk_sync_create(VkDevice device, VkSyncContext *ctx)
-{
+VkResult vk_sync_create(VkDevice device, VkSyncContext *ctx) {
   LOG_INFO("Creating sync objects");
 
   memset(ctx, 0, sizeof(VkSyncContext));
@@ -19,39 +19,16 @@ VkResult vk_sync_create(VkDevice device, VkSyncContext *ctx)
   };
 
   for(u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-    VkResult result;
-
-    result = vkCreateSemaphore(
-      device, &semaphore_info, NULL, &ctx->frames[i].image_available);
-    if(result != VK_SUCCESS) {
-      LOG_ERROR(
-        "Failed to create image available semaphore %u: %d", i, result);
-      return result;
-    }
-
-    result = vkCreateSemaphore(
-      device, &semaphore_info, NULL, &ctx->frames[i].render_finished);
-    if(result != VK_SUCCESS) {
-      LOG_ERROR(
-        "Failed to create render finished semaphore %u: %d", i, result);
-      return result;
-    }
-
-    result
-      = vkCreateFence(device, &fence_info, NULL, &ctx->frames[i].in_flight);
-    if(result != VK_SUCCESS) {
-      LOG_ERROR("Failed to create fence %u: %d", i, result);
-      return result;
-    }
+    VK_CHECK(vkCreateSemaphore(device, &semaphore_info, NULL, &ctx->frames[i].image_available));
+    VK_CHECK(vkCreateSemaphore(device, &semaphore_info, NULL, &ctx->frames[i].render_finished));
+    VK_CHECK(vkCreateFence(device, &fence_info, NULL, &ctx->frames[i].in_flight));
   }
 
-  LOG_INFO(
-    "Sync objects created for %d frames in flight", MAX_FRAMES_IN_FLIGHT);
+  LOG_INFO("Sync objects created for %d frames in flight", MAX_FRAMES_IN_FLIGHT);
   return VK_SUCCESS;
 }
 
-void vk_sync_destroy(VkDevice device, VkSyncContext *ctx)
-{
+void vk_sync_destroy(VkDevice device, VkSyncContext *ctx) {
   for(u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
     if(ctx->frames[i].image_available != VK_NULL_HANDLE) {
       vkDestroySemaphore(device, ctx->frames[i].image_available, NULL);
@@ -68,24 +45,16 @@ void vk_sync_destroy(VkDevice device, VkSyncContext *ctx)
   memset(ctx, 0, sizeof(VkSyncContext));
 }
 
-VkResult vk_sync_wait_for_fence(VkDevice device, VkSyncContext *ctx)
-{
-  return vkWaitForFences(
-    device, 1, &ctx->frames[ctx->current_frame].in_flight, VK_TRUE,
-    UINT64_MAX);
+VkResult vk_sync_wait_for_fence(VkDevice device, VkSyncContext *ctx) {
+  VK_CHECK(vkWaitForFences(device, 1, &ctx->frames[ctx->current_frame].in_flight, VK_TRUE, 1000000000));
+  return VK_SUCCESS;
 }
 
-VkResult vk_sync_reset_fence(VkDevice device, VkSyncContext *ctx)
-{
-  return vkResetFences(device, 1, &ctx->frames[ctx->current_frame].in_flight);
+VkResult vk_sync_reset_fence(VkDevice device, VkSyncContext *ctx) {
+  VK_CHECK(vkResetFences(device, 1, &ctx->frames[ctx->current_frame].in_flight));
+  return VK_SUCCESS;
 }
 
-FrameSync *vk_sync_get_current_frame(VkSyncContext *ctx)
-{
-  return &ctx->frames[ctx->current_frame];
-}
+FrameSync *vk_sync_get_current_frame(VkSyncContext *ctx) { return &ctx->frames[ctx->current_frame]; }
 
-void vk_sync_advance_frame(VkSyncContext *ctx)
-{
-  ctx->current_frame = (ctx->current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
-}
+void vk_sync_advance_frame(VkSyncContext *ctx) { ctx->current_frame = (ctx->current_frame + 1) % MAX_FRAMES_IN_FLIGHT; }
