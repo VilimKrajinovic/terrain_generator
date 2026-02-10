@@ -9,16 +9,16 @@ typedef struct InputState {
   bool keys_previous[SDL_SCANCODE_COUNT];
   bool mouse_buttons[8];
   bool mouse_buttons_previous[8];
-  f64 mouse_x;
-  f64 mouse_y;
-  f64 mouse_dx;
-  f64 mouse_dy;
-  f64 scroll_x;
-  f64 scroll_y;
+  f64  mouse_x;
+  f64  mouse_y;
+  f64  mouse_dx;
+  f64  mouse_dy;
+  f64  scroll_x;
+  f64  scroll_y;
 } InputState;
 
-static InputState g_input = {};
-static u32 g_window_id    = 0;
+static InputState g_input     = {};
+static u32        g_window_id = 0;
 
 static bool input_event_matches_window(const SDL_Event *event)
 {

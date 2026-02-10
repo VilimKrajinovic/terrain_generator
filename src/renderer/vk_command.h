@@ -7,7 +7,7 @@
 
 // Command context
 typedef struct VkCommandContext {
-  VkCommandPool pool;
+  VkCommandPool   pool;
   VkCommandBuffer buffers[MAX_FRAMES_IN_FLIGHT];
 } VkCommandContext;
 

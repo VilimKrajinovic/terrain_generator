@@ -169,7 +169,7 @@ VkResult window_create_surface(
 
 const char **window_get_required_extensions(u32 *count)
 {
-  Uint32 sdl_count              = 0;
+  Uint32             sdl_count  = 0;
   const char *const *extensions = SDL_Vulkan_GetInstanceExtensions(&sdl_count);
   if(!extensions) {
     LOG_ERROR("Failed to get Vulkan instance extensions: %s", SDL_GetError());

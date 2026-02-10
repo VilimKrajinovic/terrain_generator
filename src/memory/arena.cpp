@@ -7,8 +7,8 @@
 // Global scratch arena (single-thread only; do not use concurrently).
 // TODO (multi-thread): use thread-local scratch arenas or add locking to avoid
 // races/corruption.
-static Arena g_scratch_storage = {};
-static Arena *g_scratch_arena  = NULL;
+static Arena  g_scratch_storage = {};
+static Arena *g_scratch_arena   = NULL;
 
 static bool arena_add_overflow(size_t a, size_t b, size_t *out)
 {

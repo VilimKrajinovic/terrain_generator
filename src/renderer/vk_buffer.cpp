@@ -76,7 +76,7 @@ void vk_buffer_destroy(VkDevice device, VkBufferContext *ctx)
 VkResult vk_buffer_copy_data(
   VkDevice device, VkBufferContext *ctx, const void *data, VkDeviceSize size)
 {
-  void *mapped;
+  void    *mapped;
   VkResult result = vkMapMemory(device, ctx->memory, 0, size, 0, &mapped);
   if(result != VK_SUCCESS) {
     LOG_ERROR("Failed to map buffer memory: %d", result);
@@ -118,7 +118,7 @@ VkResult vk_buffer_create_vertex(
 
   // Create staging buffer
   VkBufferContext staging;
-  VkResult result = vk_buffer_create(
+  VkResult        result = vk_buffer_create(
     device, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
     &staging);
@@ -164,7 +164,7 @@ VkResult vk_buffer_create_index(
 
   // Create staging buffer
   VkBufferContext staging;
-  VkResult result = vk_buffer_create(
+  VkResult        result = vk_buffer_create(
     device, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
     &staging);

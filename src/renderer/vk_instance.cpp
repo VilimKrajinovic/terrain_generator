@@ -6,13 +6,13 @@
 #include <string.h>
 
 // Validation layer name
-static const char *VALIDATION_LAYERS[]  = {"VK_LAYER_KHRONOS_validation"};
-static const u32 VALIDATION_LAYER_COUNT = 1;
+static const char *VALIDATION_LAYERS[]    = {"VK_LAYER_KHRONOS_validation"};
+static const u32   VALIDATION_LAYER_COUNT = 1;
 
 // Debug callback
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
-  VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-  VkDebugUtilsMessageTypeFlagsEXT type,
+  VkDebugUtilsMessageSeverityFlagBitsEXT      severity,
+  VkDebugUtilsMessageTypeFlagsEXT             type,
   const VkDebugUtilsMessengerCallbackDataEXT *callback_data, void *user_data)
 {
   (void)type;
@@ -78,7 +78,7 @@ bool vk_instance_check_validation_support(void)
   u32 layer_count;
   vkEnumerateInstanceLayerProperties(&layer_count, NULL);
 
-  ArenaTemp scratch = arena_scratch_begin();
+  ArenaTemp          scratch = arena_scratch_begin();
   VkLayerProperties *available_layers
     = ARENA_PUSH_ARRAY(scratch.arena, VkLayerProperties, layer_count);
   if(!available_layers) {
@@ -133,7 +133,7 @@ vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx)
   };
 
   // Get required extensions
-  u32 window_extension_count = 0;
+  u32          window_extension_count = 0;
   const char **window_extensions
     = window_get_required_extensions(&window_extension_count);
   if(!window_extensions || window_extension_count == 0) {
@@ -142,8 +142,8 @@ vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *ctx)
   }
 
   // Build extension list using scratch arena
-  ArenaTemp scratch   = arena_scratch_begin();
-  u32 extension_count = window_extension_count;
+  ArenaTemp    scratch         = arena_scratch_begin();
+  u32          extension_count = window_extension_count;
   const char **extensions
     = ARENA_PUSH_ARRAY(scratch.arena, const char *, extension_count + 2);
   if(!extensions) {

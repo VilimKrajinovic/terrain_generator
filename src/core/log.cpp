@@ -41,9 +41,9 @@ void log_output(
   }
 
   // Get timestamp
-  time_t now         = time(NULL);
+  time_t     now     = time(NULL);
   struct tm *tm_info = localtime(&now);
-  char time_buf[16];
+  char       time_buf[16];
   strftime(time_buf, sizeof(time_buf), "%H:%M:%S", tm_info);
 
   // Extract just the filename from the path

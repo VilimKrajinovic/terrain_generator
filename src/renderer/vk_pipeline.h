@@ -7,7 +7,7 @@
 // Pipeline context
 typedef struct VkPipelineContext {
   VkPipelineLayout layout;
-  VkPipeline pipeline;
+  VkPipeline       pipeline;
 } VkPipelineContext;
 
 // Create graphics pipeline

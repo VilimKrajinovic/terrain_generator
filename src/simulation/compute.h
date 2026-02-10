@@ -8,11 +8,11 @@
 // This will be used for terrain generation and corrosion simulation
 
 typedef struct ComputeContext {
-    VkPipeline pipeline;
-    VkPipelineLayout layout;
-    VkDescriptorSetLayout descriptor_layout;
-    VkDescriptorPool descriptor_pool;
-    VkDescriptorSet descriptor_set;
+  VkPipeline            pipeline;
+  VkPipelineLayout      layout;
+  VkDescriptorSetLayout descriptor_layout;
+  VkDescriptorPool      descriptor_pool;
+  VkDescriptorSet       descriptor_set;
 } ComputeContext;
 
 #endif // COMPUTE_H

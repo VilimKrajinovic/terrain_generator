@@ -7,15 +7,15 @@
 // Instance configuration
 typedef struct VkInstanceConfig {
   const char *app_name;
-  u32 app_version;
-  bool enable_validation;
+  u32         app_version;
+  bool        enable_validation;
 } VkInstanceConfig;
 
 // Instance context
 typedef struct VkInstanceContext {
-  VkInstance instance;
+  VkInstance               instance;
   VkDebugUtilsMessengerEXT debug_messenger;
-  bool validation_enabled;
+  bool                     validation_enabled;
 } VkInstanceContext;
 
 // Create Vulkan instance

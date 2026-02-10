@@ -128,8 +128,8 @@ void app_run(AppContext *app)
 {
   LOG_INFO("Starting main loop");
 
-  u64 last_ticks = SDL_GetTicksNS();
-  Result result  = RESULT_SUCCESS;
+  u64    last_ticks = SDL_GetTicksNS();
+  Result result     = RESULT_SUCCESS;
 
   while(!window_should_close(&app->window)
         && app->state == APP_STATE_RUNNING) {

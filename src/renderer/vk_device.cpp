@@ -17,7 +17,7 @@ static bool check_device_extension_support(VkPhysicalDevice device)
   u32 extension_count;
   vkEnumerateDeviceExtensionProperties(device, NULL, &extension_count, NULL);
 
-  ArenaTemp scratch = arena_scratch_begin();
+  ArenaTemp              scratch = arena_scratch_begin();
   VkExtensionProperties *available_extensions
     = ARENA_PUSH_ARRAY(scratch.arena, VkExtensionProperties, extension_count);
   if(!available_extensions) {
@@ -55,7 +55,7 @@ vk_device_find_queue_families(VkPhysicalDevice device, VkSurfaceKHR surface)
   u32 queue_family_count = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, NULL);
 
-  ArenaTemp scratch                       = arena_scratch_begin();
+  ArenaTemp                scratch        = arena_scratch_begin();
   VkQueueFamilyProperties *queue_families = ARENA_PUSH_ARRAY(
     scratch.arena, VkQueueFamilyProperties, queue_family_count);
   if(!queue_families) {
@@ -99,7 +99,7 @@ bool vk_device_queue_families_complete(const QueueFamilyIndices *indices)
 static u32 rate_device(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
   VkPhysicalDeviceProperties properties;
-  VkPhysicalDeviceFeatures features;
+  VkPhysicalDeviceFeatures   features;
   vkGetPhysicalDeviceProperties(device, &properties);
   vkGetPhysicalDeviceFeatures(device, &features);
 
@@ -140,7 +140,7 @@ static VkResult select_physical_device(
     return VK_ERROR_INITIALIZATION_FAILED;
   }
 
-  ArenaTemp scratch = arena_scratch_begin();
+  ArenaTemp         scratch = arena_scratch_begin();
   VkPhysicalDevice *devices
     = ARENA_PUSH_ARRAY(scratch.arena, VkPhysicalDevice, device_count);
   if(!devices) {
@@ -152,7 +152,7 @@ static VkResult select_physical_device(
 
   // Rate and select best device
   VkPhysicalDevice best_device = VK_NULL_HANDLE;
-  u32 best_score               = 0;
+  u32              best_score  = 0;
 
   LOG_INFO("Found %u physical device(s):", device_count);
   for(u32 i = 0; i < device_count; i++) {
@@ -206,9 +206,9 @@ VkResult vk_device_create(
     = vk_device_find_queue_families(ctx->physical_device, surface);
 
   // Create queue create infos
-  float queue_priority = 1.0f;
+  float                   queue_priority = 1.0f;
   VkDeviceQueueCreateInfo queue_create_infos[2];
-  u32 queue_create_info_count = 0;
+  u32                     queue_create_info_count = 0;
 
   // Graphics queue
   queue_create_infos[queue_create_info_count++] = VkDeviceQueueCreateInfo{

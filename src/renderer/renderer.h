@@ -9,7 +9,7 @@ typedef struct Renderer Renderer;
 
 typedef struct RendererConfig {
   const char *app_name;
-  bool enable_validation;
+  bool        enable_validation;
 } RendererConfig;
 
 Result renderer_create(
@@ -19,6 +19,6 @@ void renderer_destroy(Renderer *renderer);
 
 Result renderer_draw(Renderer *renderer);
 Result renderer_resize(Renderer *renderer);
-void renderer_wait_idle(Renderer *renderer);
+void   renderer_wait_idle(Renderer *renderer);
 
 #endif // RENDERER_H

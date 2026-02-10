@@ -7,9 +7,9 @@
 
 // Buffer context
 typedef struct VkBufferContext {
-  VkBuffer buffer;
+  VkBuffer       buffer;
   VkDeviceMemory memory;
-  VkDeviceSize size;
+  VkDeviceSize   size;
 } VkBufferContext;
 
 // Create a generic buffer

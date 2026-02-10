@@ -7,9 +7,9 @@
 // Mesh structure
 typedef struct Mesh {
   Vertex *vertices;
-  u32 vertex_count;
-  u32 *indices;
-  u32 index_count;
+  u32     vertex_count;
+  u32    *indices;
+  u32     index_count;
 } Mesh;
 
 // Initialize an empty mesh

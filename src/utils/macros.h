@@ -38,8 +38,8 @@
   } while(0)
 
 // Min/Max macros
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b)            ((a) < (b) ? (a) : (b))
+#define MAX(a, b)            ((a) > (b) ? (a) : (b))
 #define CLAMP(val, min, max) (MAX(min, MIN(max, val)))
 
 // Unused parameter macro

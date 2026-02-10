@@ -12,20 +12,20 @@
 // Swapchain support details
 typedef struct SwapchainSupportDetails {
   VkSurfaceCapabilitiesKHR capabilities;
-  VkSurfaceFormatKHR *formats;
-  u32 format_count;
-  VkPresentModeKHR *present_modes;
-  u32 present_mode_count;
+  VkSurfaceFormatKHR      *formats;
+  u32                      format_count;
+  VkPresentModeKHR        *present_modes;
+  u32                      present_mode_count;
 } SwapchainSupportDetails;
 
 // Swapchain context
 typedef struct VkSwapchainContext {
   VkSwapchainKHR swapchain;
-  VkImage images[MAX_SWAPCHAIN_IMAGES];
-  VkImageView image_views[MAX_SWAPCHAIN_IMAGES];
-  u32 image_count;
-  VkFormat format;
-  VkExtent2D extent;
+  VkImage        images[MAX_SWAPCHAIN_IMAGES];
+  VkImageView    image_views[MAX_SWAPCHAIN_IMAGES];
+  u32            image_count;
+  VkFormat       format;
+  VkExtent2D     extent;
 } VkSwapchainContext;
 
 // Query swapchain support (allocates from arena)

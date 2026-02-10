@@ -6,21 +6,21 @@
 
 // Queue family indices
 typedef struct QueueFamilyIndices {
-  u32 graphics_family;
-  u32 present_family;
+  u32  graphics_family;
+  u32  present_family;
   bool graphics_family_found;
   bool present_family_found;
 } QueueFamilyIndices;
 
 // Device context
 typedef struct VkDeviceContext {
-  VkPhysicalDevice physical_device;
-  VkDevice device;
-  VkQueue graphics_queue;
-  VkQueue present_queue;
-  QueueFamilyIndices queue_families;
-  VkPhysicalDeviceProperties properties;
-  VkPhysicalDeviceFeatures features;
+  VkPhysicalDevice                 physical_device;
+  VkDevice                         device;
+  VkQueue                          graphics_queue;
+  VkQueue                          present_queue;
+  QueueFamilyIndices               queue_families;
+  VkPhysicalDeviceProperties       properties;
+  VkPhysicalDeviceFeatures         features;
   VkPhysicalDeviceMemoryProperties memory_properties;
 } VkDeviceContext;
 

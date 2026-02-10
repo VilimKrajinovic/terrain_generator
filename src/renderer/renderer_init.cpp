@@ -26,10 +26,10 @@ Result renderer_create(
 
   LOG_INFO("Initializing renderer");
 
-  Result error       = RESULT_SUCCESS;
+  Result   error     = RESULT_SUCCESS;
   VkResult vk_result = VK_SUCCESS;
-  u32 width          = 0;
-  u32 height         = 0;
+  u32      width     = 0;
+  u32      height    = 0;
 
   VkInstanceConfig instance_config = {
     .app_name          = config->app_name,

@@ -21,14 +21,14 @@ typedef struct MemoryConfig {
 
 typedef struct MemoryContext {
   Arena arenas[MEMORY_ARENA_COUNT];
-  bool initialized;
+  bool  initialized;
 } MemoryContext;
 
 bool memory_init(MemoryContext *memory, const MemoryConfig *config);
 void memory_shutdown(MemoryContext *memory);
 
-Arena *memory_arena(MemoryContext *memory, MemoryArenaId id);
-void memory_begin_frame(MemoryContext *memory);
+Arena    *memory_arena(MemoryContext *memory, MemoryArenaId id);
+void      memory_begin_frame(MemoryContext *memory);
 ArenaTemp memory_scratch_begin(MemoryContext *memory);
 
 Arena *permanent_memory(MemoryContext *memory);

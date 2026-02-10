@@ -19,8 +19,8 @@ Result renderer_draw(Renderer *renderer)
     return RESULT_ERROR_VULKAN;
   }
 
-  FrameSync *frame = vk_sync_get_current_frame(&renderer->sync);
-  u32 image_index  = 0;
+  FrameSync *frame       = vk_sync_get_current_frame(&renderer->sync);
+  u32        image_index = 0;
 
   vk_result = vkAcquireNextImageKHR(
     renderer->device.device, renderer->swapchain.swapchain, UINT64_MAX,
@@ -94,8 +94,8 @@ Result renderer_draw(Renderer *renderer)
   };
   vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-  VkBuffer vertex_buffers[] = {renderer->vertex_buffer->buffer};
-  VkDeviceSize offsets[]    = {0};
+  VkBuffer     vertex_buffers[] = {renderer->vertex_buffer->buffer};
+  VkDeviceSize offsets[]        = {0};
   vkCmdBindVertexBuffers(cmd, 0, 1, vertex_buffers, offsets);
   vkCmdBindIndexBuffer(
     cmd, renderer->index_buffer->buffer, 0, VK_INDEX_TYPE_UINT32);
@@ -109,7 +109,7 @@ Result renderer_draw(Renderer *renderer)
     return RESULT_ERROR_VULKAN;
   }
 
-  VkSemaphore wait_semaphores[] = {frame->image_available};
+  VkSemaphore          wait_semaphores[] = {frame->image_available};
   VkPipelineStageFlags wait_stages[]
     = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
   VkSemaphore signal_semaphores[] = {renderer->render_finished[image_index]};
@@ -132,7 +132,7 @@ Result renderer_draw(Renderer *renderer)
     return RESULT_ERROR_VULKAN;
   }
 
-  VkSwapchainKHR swapchains[]   = {renderer->swapchain.swapchain};
+  VkSwapchainKHR   swapchains[] = {renderer->swapchain.swapchain};
   VkPresentInfoKHR present_info = {
     .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
     .waitSemaphoreCount = 1,

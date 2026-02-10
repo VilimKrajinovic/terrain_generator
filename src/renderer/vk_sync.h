@@ -11,13 +11,13 @@
 typedef struct FrameSync {
   VkSemaphore image_available;
   VkSemaphore render_finished;
-  VkFence in_flight;
+  VkFence     in_flight;
 } FrameSync;
 
 // Sync context
 typedef struct VkSyncContext {
   FrameSync frames[MAX_FRAMES_IN_FLIGHT];
-  u32 current_frame;
+  u32       current_frame;
 } VkSyncContext;
 
 // Create sync objects

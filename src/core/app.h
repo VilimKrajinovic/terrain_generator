@@ -21,22 +21,22 @@ typedef enum AppState {
 // Application configuration
 typedef struct AppConfig {
   const char *name;
-  u32 window_width;
-  u32 window_height;
-  bool enable_validation;
+  u32         window_width;
+  u32         window_height;
+  bool        enable_validation;
 } AppConfig;
 
 // Application context
 typedef struct AppContext {
-  AppConfig config;
-  AppState state;
-  MemoryContext memory;
-  WindowContext window;
-  Renderer *renderer;
+  AppConfig       config;
+  AppState        state;
+  MemoryContext   memory;
+  WindowContext   window;
+  Renderer       *renderer;
   SimulationState simulation;
-  f64 delta_time;
-  f64 total_time;
-  u64 frame_count;
+  f64             delta_time;
+  f64             total_time;
+  u64             frame_count;
 } AppContext;
 
 // Create default app config

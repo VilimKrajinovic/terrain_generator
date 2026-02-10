@@ -10,8 +10,8 @@ vk_shader_load(VkDevice device, const char *path, VkShaderModule *module)
 
   // Read SPIR-V file using scratch arena
   ArenaTemp scratch = arena_scratch_begin();
-  size_t code_size;
-  u8 *code = file_read_binary_arena(path, &code_size, scratch.arena);
+  size_t    code_size;
+  u8       *code = file_read_binary_arena(path, &code_size, scratch.arena);
   if(!code) {
     LOG_ERROR("Failed to read shader file: %s", path);
     arena_temp_end(scratch);

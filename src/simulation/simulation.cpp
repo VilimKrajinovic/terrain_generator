@@ -3,8 +3,9 @@
 #include "core/log.h"
 #include "utils/macros.h"
 
-Result simulation_init(SimulationState *simulation, Arena *arena) {
-  if (!simulation) {
+Result simulation_init(SimulationState *simulation, Arena *arena)
+{
+  if(!simulation) {
     return RESULT_ERROR_GENERIC;
   }
 
@@ -15,8 +16,9 @@ Result simulation_init(SimulationState *simulation, Arena *arena) {
   return RESULT_SUCCESS;
 }
 
-void simulation_shutdown(SimulationState *simulation) {
-  if (!simulation || !simulation->initialized) {
+void simulation_shutdown(SimulationState *simulation)
+{
+  if(!simulation || !simulation->initialized) {
     return;
   }
 
@@ -24,8 +26,9 @@ void simulation_shutdown(SimulationState *simulation) {
   LOG_INFO("Simulation shutdown");
 }
 
-void simulation_update(SimulationState *simulation, f64 delta_time) {
-  if (!simulation || !simulation->initialized) {
+void simulation_update(SimulationState *simulation, f64 delta_time)
+{
+  if(!simulation || !simulation->initialized) {
     return;
   }
 

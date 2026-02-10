@@ -132,7 +132,7 @@ VkResult vk_swapchain_create(
   memset(ctx, 0, sizeof(VkSwapchainContext));
 
   // Query support details using scratch arena
-  ArenaTemp scratch               = arena_scratch_begin();
+  ArenaTemp               scratch = arena_scratch_begin();
   SwapchainSupportDetails support = vk_swapchain_query_support(
     device->physical_device, surface, scratch.arena);
 

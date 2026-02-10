@@ -12,21 +12,21 @@ struct SDL_Window;
 // Window configuration
 typedef struct WindowConfig {
   const char *title;
-  u32 width;
-  u32 height;
-  bool resizable;
-  bool fullscreen;
+  u32         width;
+  u32         height;
+  bool        resizable;
+  bool        fullscreen;
 } WindowConfig;
 
 // Window context
 typedef struct WindowContext {
   struct SDL_Window *handle;
-  u32 window_id;
-  u32 width;
-  u32 height;
-  bool resized;
-  bool minimized;
-  bool should_close;
+  u32                window_id;
+  u32                width;
+  u32                height;
+  bool               resized;
+  bool               minimized;
+  bool               should_close;
 } WindowContext;
 
 // Create default window config
