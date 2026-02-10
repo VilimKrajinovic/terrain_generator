@@ -6,13 +6,14 @@
 
 // Pipeline context
 typedef struct VkPipelineContext {
-    VkPipelineLayout layout;
-    VkPipeline pipeline;
+  VkPipelineLayout layout;
+  VkPipeline pipeline;
 } VkPipelineContext;
 
 // Create graphics pipeline
-VkResult vk_pipeline_create(VkDevice device, VkRenderPass render_pass,
-                            VkExtent2D extent, VkPipelineContext *ctx);
+VkResult vk_pipeline_create(
+  VkDevice device, VkRenderPass render_pass, VkExtent2D extent,
+  VkPipelineContext *ctx);
 
 // Destroy pipeline
 void vk_pipeline_destroy(VkDevice device, VkPipelineContext *ctx);

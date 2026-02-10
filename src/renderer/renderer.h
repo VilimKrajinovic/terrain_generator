@@ -12,8 +12,9 @@ typedef struct RendererConfig {
   bool enable_validation;
 } RendererConfig;
 
-Result renderer_create(Renderer **out_renderer, WindowContext *window,
-                       const RendererConfig *config, Arena *arena);
+Result renderer_create(
+  Renderer **out_renderer, WindowContext *window, const RendererConfig *config,
+  Arena *arena);
 void renderer_destroy(Renderer *renderer);
 
 Result renderer_draw(Renderer *renderer);

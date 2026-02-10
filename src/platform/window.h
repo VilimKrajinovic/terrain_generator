@@ -11,22 +11,22 @@ struct SDL_Window;
 
 // Window configuration
 typedef struct WindowConfig {
-    const char *title;
-    u32 width;
-    u32 height;
-    bool resizable;
-    bool fullscreen;
+  const char *title;
+  u32 width;
+  u32 height;
+  bool resizable;
+  bool fullscreen;
 } WindowConfig;
 
 // Window context
 typedef struct WindowContext {
-    struct SDL_Window *handle;
-    u32 window_id;
-    u32 width;
-    u32 height;
-    bool resized;
-    bool minimized;
-    bool should_close;
+  struct SDL_Window *handle;
+  u32 window_id;
+  u32 width;
+  u32 height;
+  bool resized;
+  bool minimized;
+  bool should_close;
 } WindowContext;
 
 // Create default window config
@@ -57,7 +57,8 @@ bool window_wait_event(WindowContext *ctx, SDL_Event *event);
 void window_get_framebuffer_size(WindowContext *ctx, u32 *width, u32 *height);
 
 // Create Vulkan surface for window
-VkResult window_create_surface(WindowContext *ctx, VkInstance instance, VkSurfaceKHR *surface);
+VkResult window_create_surface(
+  WindowContext *ctx, VkInstance instance, VkSurfaceKHR *surface);
 
 // Get required Vulkan extensions for window surface
 const char **window_get_required_extensions(u32 *count);

@@ -7,12 +7,13 @@
 
 // Command context
 typedef struct VkCommandContext {
-    VkCommandPool pool;
-    VkCommandBuffer buffers[MAX_FRAMES_IN_FLIGHT];
+  VkCommandPool pool;
+  VkCommandBuffer buffers[MAX_FRAMES_IN_FLIGHT];
 } VkCommandContext;
 
 // Create command pool and buffers
-VkResult vk_command_create(VkDevice device, u32 queue_family_index, VkCommandContext *ctx);
+VkResult vk_command_create(
+  VkDevice device, u32 queue_family_index, VkCommandContext *ctx);
 
 // Destroy command context
 void vk_command_destroy(VkDevice device, VkCommandContext *ctx);
@@ -30,6 +31,7 @@ VkResult vk_command_end(VkCommandBuffer buffer);
 VkCommandBuffer vk_command_begin_single(VkDevice device, VkCommandPool pool);
 
 // End and submit single-time command buffer
-VkResult vk_command_end_single(VkDevice device, VkCommandPool pool, VkQueue queue, VkCommandBuffer buffer);
+VkResult vk_command_end_single(
+  VkDevice device, VkCommandPool pool, VkQueue queue, VkCommandBuffer buffer);
 
 #endif // VK_COMMAND_H

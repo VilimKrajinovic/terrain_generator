@@ -6,10 +6,10 @@
 // Log levels
 typedef enum LogLevel {
   LOG_LEVEL_DEBUG = 0,
-  LOG_LEVEL_INFO = 1,
-  LOG_LEVEL_WARN = 2,
+  LOG_LEVEL_INFO  = 1,
+  LOG_LEVEL_WARN  = 2,
   LOG_LEVEL_ERROR = 3,
-  LOG_LEVEL_NONE = 4,
+  LOG_LEVEL_NONE  = 4,
 } LogLevel;
 
 // Initialize logging system
@@ -25,8 +25,8 @@ void log_set_level(LogLevel level);
 LogLevel log_get_level(void);
 
 // Core logging function
-void log_output(LogLevel level, const char *file, int line, const char *fmt,
-                ...);
+void log_output(
+  LogLevel level, const char *file, int line, const char *fmt, ...);
 
 // Convenience macros
 // Note: Using GNU extension ##__VA_ARGS__ for compatibility with zero variadic
@@ -36,13 +36,13 @@ void log_output(LogLevel level, const char *file, int line, const char *fmt,
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #endif
 
-#define LOG_DEBUG(fmt, ...)                                                    \
+#define LOG_DEBUG(fmt, ...)                                                   \
   log_output(LOG_LEVEL_DEBUG, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
-#define LOG_INFO(fmt, ...)                                                     \
+#define LOG_INFO(fmt, ...)                                                    \
   log_output(LOG_LEVEL_INFO, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
-#define LOG_WARN(fmt, ...)                                                     \
+#define LOG_WARN(fmt, ...)                                                    \
   log_output(LOG_LEVEL_WARN, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
-#define LOG_ERROR(fmt, ...)                                                    \
+#define LOG_ERROR(fmt, ...)                                                   \
   log_output(LOG_LEVEL_ERROR, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
 
 #ifdef __clang__
