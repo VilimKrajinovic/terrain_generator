@@ -174,8 +174,21 @@ void app_run(AppContext *app) {
         continue;
       }
     }
+    const f32 velocity = app->camera.movement_speed * (f32)app->delta_time;
 
-    
+    if(input_key_down(KEY_W)) {
+      app->camera.position += app->camera.front * velocity;
+    }
+    if(input_key_down(KEY_S)) {
+      app->camera.position -= app->camera.front * velocity;
+    }
+    if(input_key_down(KEY_A)) {
+      app->camera.position -= app->camera.right * velocity;
+    }
+    if(input_key_down(KEY_D)) {
+      app->camera.position += app->camera.right * velocity;
+    }
+
     camera_update_vectors(app->camera);
     // simulation_update(&app->simulation, app->delta_time);
 
