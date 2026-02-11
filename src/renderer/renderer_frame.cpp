@@ -1,13 +1,15 @@
 #include "foundation/result.h"
 #include "renderer_internal.h"
 
+#include "camera/camera.h"
 #include "core/log.h"
 #include "utils/macros.h"
+#include <string.h>
 
 const i32 ONE_SECOND = 1000000000;
 
-Result renderer_draw(Renderer *renderer) {
-  if(!renderer) {
+Result renderer_draw(Renderer *renderer, const Camera *camera) {
+  if(!renderer || !camera) {
     return RESULT_ERROR_GENERIC;
   }
 
@@ -23,6 +25,7 @@ Result renderer_draw(Renderer *renderer) {
 
   FrameSync *frame_sync  = vk_sync_get_current_frame(&renderer->sync);
   u32        image_index = 0;
+  u32        frame_index = renderer->sync.current_frame;
 
   vk_result = vkAcquireNextImageKHR(renderer->device.device,
                                     renderer->swapchain.swapchain,
@@ -55,7 +58,19 @@ Result renderer_draw(Renderer *renderer) {
   }
   renderer->images_in_flight[image_index] = frame_sync->in_flight;
 
-  VkCommandBuffer cmd = vk_command_get_buffer(&renderer->command, renderer->sync.current_frame);
+  const f32 aspect = renderer->swapchain.extent.height > 0
+                     ? (f32)renderer->swapchain.extent.width / (f32)renderer->swapchain.extent.height
+                     : 1.0f;
+
+  CameraUniformData uniform_data = {};
+  uniform_data.view              = view_matrix(*camera);
+  uniform_data.proj              = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f);
+  uniform_data.proj[1][1] *= -1.0f;
+  uniform_data.camera_pos = glm::vec4(camera->position, 1.0f);
+
+  memcpy(renderer->camera_uniform_mapped[frame_index], &uniform_data, sizeof(uniform_data));
+
+  VkCommandBuffer cmd = vk_command_get_buffer(&renderer->command, frame_index);
 
   VK_CHECK_RETURN(vk_command_begin(cmd, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT), RESULT_ERROR_VULKAN);
 
@@ -76,6 +91,14 @@ Result renderer_draw(Renderer *renderer) {
 
   vkCmdBeginRenderPass(cmd, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
   vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->pipeline->pipeline);
+  vkCmdBindDescriptorSets(cmd,
+                          VK_PIPELINE_BIND_POINT_GRAPHICS,
+                          renderer->pipeline->layout,
+                          0,
+                          1,
+                          &renderer->camera_descriptor_sets[frame_index],
+                          0,
+                          NULL);
 
   VkViewport viewport = {
     .x        = 0.0f,

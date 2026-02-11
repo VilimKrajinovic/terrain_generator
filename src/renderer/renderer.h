@@ -6,6 +6,7 @@
 #include "platform/window.h"
 
 typedef struct Renderer Renderer;
+struct Camera;
 
 typedef struct RendererConfig {
   const char *app_name;
@@ -15,7 +16,7 @@ typedef struct RendererConfig {
 Result renderer_create(Renderer **out_renderer, WindowContext *window, const RendererConfig *config, Arena *arena);
 void   renderer_destroy(Renderer *renderer);
 
-Result renderer_draw(Renderer *renderer);
+Result renderer_draw(Renderer *renderer, const Camera *camera);
 Result renderer_resize(Renderer *renderer);
 void   renderer_wait_idle(Renderer *renderer);
 

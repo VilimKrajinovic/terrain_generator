@@ -20,7 +20,7 @@ struct Camera {
   f32       zoom{45.f};
 };
 
-inline void update_vectors(Camera &c) {
+inline void camera_update_vectors(Camera &c) {
   glm::vec3 f;
   f.x     = cos(glm::radians(c.yaw)) * cos(glm::radians(c.pitch));
   f.y     = sin(glm::radians(c.pitch));
@@ -35,7 +35,7 @@ inline glm::mat4 view_matrix(const Camera &c) { return glm::lookAt(c.position, c
 inline Camera camera_default() {
   Camera c{};
   c.position = {0.f, 0.f, 3.f};
-  update_vectors(c);
+  camera_update_vectors(c);
   return c;
 }
 

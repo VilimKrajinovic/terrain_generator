@@ -6,6 +6,7 @@
 
 // Pipeline context
 typedef struct VkPipelineContext {
+  VkDescriptorSetLayout global_set_layout;
   VkPipelineLayout layout;
   VkPipeline       pipeline;
 } VkPipelineContext;

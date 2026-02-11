@@ -175,10 +175,12 @@ void app_run(AppContext *app) {
       }
     }
 
-    simulation_update(&app->simulation, app->delta_time);
+    
+    camera_update_vectors(app->camera);
+    // simulation_update(&app->simulation, app->delta_time);
 
     // Render frame
-    result = renderer_draw(app->renderer);
+    result = renderer_draw(app->renderer, &app->camera);
     if(result != RESULT_SUCCESS) {
       LOG_ERROR("Renderer frame failed: %d", result);
       app_request_shutdown(app);

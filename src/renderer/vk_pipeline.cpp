@@ -94,7 +94,7 @@ VkResult vk_pipeline_create(VkDevice device, VkRenderPass render_pass, VkExtent2
     .polygonMode             = VK_POLYGON_MODE_FILL,
     .lineWidth               = 1.0f,
     .cullMode                = VK_CULL_MODE_BACK_BIT,
-    .frontFace               = VK_FRONT_FACE_CLOCKWISE,
+    .frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE,
     .depthBiasEnable         = VK_FALSE,
   };
 
@@ -131,10 +131,33 @@ VkResult vk_pipeline_create(VkDevice device, VkRenderPass render_pass, VkExtent2
     .pDynamicStates    = dynamic_states,
   };
 
+  VkDescriptorSetLayoutBinding camera_ubo_binding = {
+    .binding            = 0,
+    .descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+    .descriptorCount    = 1,
+    .stageFlags         = VK_SHADER_STAGE_VERTEX_BIT,
+    .pImmutableSamplers = NULL,
+  };
+
+  VkDescriptorSetLayoutCreateInfo set_layout_info = {
+    .sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+    .bindingCount = 1,
+    .pBindings    = &camera_ubo_binding,
+  };
+
+  result = vkCreateDescriptorSetLayout(device, &set_layout_info, NULL, &ctx->global_set_layout);
+  if(result != VK_SUCCESS) {
+    LOG_ERROR("Failed to create descriptor set layout: %d", result);
+    vk_shader_destroy(device, vert_module);
+    vk_shader_destroy(device, frag_module);
+    return result;
+  }
+
   // Pipeline layout
   VkPipelineLayoutCreateInfo layout_info = {
     .sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-    .setLayoutCount         = 0,
+    .setLayoutCount         = 1,
+    .pSetLayouts            = &ctx->global_set_layout,
     .pushConstantRangeCount = 0,
   };
 
@@ -143,6 +166,7 @@ VkResult vk_pipeline_create(VkDevice device, VkRenderPass render_pass, VkExtent2
     LOG_ERROR("Failed to create pipeline layout: %d", result);
     vk_shader_destroy(device, vert_module);
     vk_shader_destroy(device, frag_module);
+    vkDestroyDescriptorSetLayout(device, ctx->global_set_layout, NULL);
     return result;
   }
 
@@ -175,6 +199,7 @@ VkResult vk_pipeline_create(VkDevice device, VkRenderPass render_pass, VkExtent2
   if(result != VK_SUCCESS) {
     LOG_ERROR("Failed to create graphics pipeline: %d", result);
     vkDestroyPipelineLayout(device, ctx->layout, NULL);
+    vkDestroyDescriptorSetLayout(device, ctx->global_set_layout, NULL);
     return result;
   }
 
@@ -188,6 +213,9 @@ void vk_pipeline_destroy(VkDevice device, VkPipelineContext *ctx) {
   }
   if(ctx->layout != VK_NULL_HANDLE) {
     vkDestroyPipelineLayout(device, ctx->layout, NULL);
+  }
+  if(ctx->global_set_layout != VK_NULL_HANDLE) {
+    vkDestroyDescriptorSetLayout(device, ctx->global_set_layout, NULL);
   }
 
   LOG_DEBUG("Graphics pipeline destroyed");

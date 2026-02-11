@@ -11,6 +11,13 @@
 #include "renderer/vk_renderpass.h"
 #include "renderer/vk_swapchain.h"
 #include "renderer/vk_sync.h"
+#include "glm/glm.hpp"
+
+typedef struct CameraUniformData {
+  glm::mat4 view;
+  glm::mat4 proj;
+  glm::vec4 camera_pos;
+} CameraUniformData;
 
 struct Renderer {
   VkInstanceContext  instance;
@@ -27,6 +34,10 @@ struct Renderer {
   u32           framebuffer_count;
   VkFence       images_in_flight[MAX_SWAPCHAIN_IMAGES];
   VkSemaphore   render_finished[MAX_SWAPCHAIN_IMAGES];
+  VkBufferContext camera_uniform_buffers[MAX_FRAMES_IN_FLIGHT];
+  void           *camera_uniform_mapped[MAX_FRAMES_IN_FLIGHT];
+  VkDescriptorPool descriptor_pool;
+  VkDescriptorSet  camera_descriptor_sets[MAX_FRAMES_IN_FLIGHT];
 
   VkBufferContext *vertex_buffer;
   VkBufferContext *index_buffer;

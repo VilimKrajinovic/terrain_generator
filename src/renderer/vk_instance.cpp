@@ -116,7 +116,7 @@ VkResult vk_instance_create(const VkInstanceConfig *config, VkInstanceContext *c
     .applicationVersion = config->app_version,
     .pEngineName        = "No Engine",
     .engineVersion      = VK_MAKE_VERSION(1, 0, 0),
-    .apiVersion         = VK_API_VERSION_1_2,
+    .apiVersion         = VK_API_VERSION_1_4,
   };
 
   // Get required extensions

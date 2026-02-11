@@ -5,6 +5,114 @@
 
 #include <string.h>
 
+static void renderer_internal_destroy_camera_uniforms(Renderer *renderer) {
+  for(u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+    if(renderer->camera_uniform_mapped[i] && renderer->camera_uniform_buffers[i].memory != VK_NULL_HANDLE) {
+      vkUnmapMemory(renderer->device.device, renderer->camera_uniform_buffers[i].memory);
+      renderer->camera_uniform_mapped[i] = NULL;
+    }
+    vk_buffer_destroy(renderer->device.device, &renderer->camera_uniform_buffers[i]);
+    renderer->camera_descriptor_sets[i] = VK_NULL_HANDLE;
+  }
+
+  if(renderer->descriptor_pool != VK_NULL_HANDLE) {
+    vkDestroyDescriptorPool(renderer->device.device, renderer->descriptor_pool, NULL);
+    renderer->descriptor_pool = VK_NULL_HANDLE;
+  }
+}
+
+static VkResult renderer_internal_create_camera_uniforms(Renderer *renderer) {
+  memset(renderer->camera_uniform_buffers, 0, sizeof(renderer->camera_uniform_buffers));
+  memset(renderer->camera_uniform_mapped, 0, sizeof(renderer->camera_uniform_mapped));
+  memset(renderer->camera_descriptor_sets, 0, sizeof(renderer->camera_descriptor_sets));
+  renderer->descriptor_pool = VK_NULL_HANDLE;
+
+  for(u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+    VkResult result = vk_buffer_create(&renderer->device,
+                                       sizeof(CameraUniformData),
+                                       VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                       &renderer->camera_uniform_buffers[i]);
+    if(result != VK_SUCCESS) {
+      LOG_ERROR("Failed to create camera uniform buffer %u: %d", i, result);
+      renderer_internal_destroy_camera_uniforms(renderer);
+      return result;
+    }
+
+    result = vkMapMemory(renderer->device.device,
+                         renderer->camera_uniform_buffers[i].memory,
+                         0,
+                         sizeof(CameraUniformData),
+                         0,
+                         &renderer->camera_uniform_mapped[i]);
+    if(result != VK_SUCCESS) {
+      LOG_ERROR("Failed to map camera uniform buffer %u: %d", i, result);
+      renderer_internal_destroy_camera_uniforms(renderer);
+      return result;
+    }
+  }
+
+  VkDescriptorPoolSize pool_size = {
+    .type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+    .descriptorCount = MAX_FRAMES_IN_FLIGHT,
+  };
+
+  VkDescriptorPoolCreateInfo pool_info = {
+    .sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+    .poolSizeCount = 1,
+    .pPoolSizes    = &pool_size,
+    .maxSets       = MAX_FRAMES_IN_FLIGHT,
+  };
+
+  VkResult result = vkCreateDescriptorPool(renderer->device.device, &pool_info, NULL, &renderer->descriptor_pool);
+  if(result != VK_SUCCESS) {
+    LOG_ERROR("Failed to create descriptor pool: %d", result);
+    renderer_internal_destroy_camera_uniforms(renderer);
+    return result;
+  }
+
+  VkDescriptorSetLayout layouts[MAX_FRAMES_IN_FLIGHT];
+  for(u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+    layouts[i] = renderer->pipeline->global_set_layout;
+  }
+
+  VkDescriptorSetAllocateInfo alloc_info = {
+    .sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+    .descriptorPool     = renderer->descriptor_pool,
+    .descriptorSetCount = MAX_FRAMES_IN_FLIGHT,
+    .pSetLayouts        = layouts,
+  };
+
+  result = vkAllocateDescriptorSets(renderer->device.device, &alloc_info, renderer->camera_descriptor_sets);
+  if(result != VK_SUCCESS) {
+    LOG_ERROR("Failed to allocate descriptor sets: %d", result);
+    renderer_internal_destroy_camera_uniforms(renderer);
+    return result;
+  }
+
+  for(u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+    VkDescriptorBufferInfo buffer_info = {
+      .buffer = renderer->camera_uniform_buffers[i].buffer,
+      .offset = 0,
+      .range  = sizeof(CameraUniformData),
+    };
+
+    VkWriteDescriptorSet descriptor_write = {
+      .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+      .dstSet          = renderer->camera_descriptor_sets[i],
+      .dstBinding      = 0,
+      .dstArrayElement = 0,
+      .descriptorCount = 1,
+      .descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+      .pBufferInfo     = &buffer_info,
+    };
+
+    vkUpdateDescriptorSets(renderer->device.device, 1, &descriptor_write, 0, NULL);
+  }
+
+  return VK_SUCCESS;
+}
+
 Result renderer_create(Renderer **out_renderer, WindowContext *window, const RendererConfig *config, Arena *arena) {
   if(!out_renderer || !window || !config || !arena) {
     return RESULT_ERROR_GENERIC;
@@ -119,6 +227,13 @@ Result renderer_create(Renderer **out_renderer, WindowContext *window, const Ren
     goto fail;
   }
 
+  vk_result = renderer_internal_create_camera_uniforms(renderer);
+  if(vk_result != VK_SUCCESS) {
+    LOG_ERROR("Failed to create camera uniform resources");
+    error = RESULT_ERROR_VULKAN;
+    goto fail;
+  }
+
   vk_result = renderer_internal_create_framebuffers(renderer);
   if(vk_result != VK_SUCCESS) {
     LOG_ERROR("Failed to create framebuffers");
@@ -203,6 +318,9 @@ void renderer_destroy(Renderer *renderer) {
   }
   if(has_device && renderer->vertex_buffer) {
     vk_buffer_destroy(renderer->device.device, renderer->vertex_buffer);
+  }
+  if(has_device) {
+    renderer_internal_destroy_camera_uniforms(renderer);
   }
 
   if(has_device) {
