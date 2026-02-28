@@ -1,6 +1,7 @@
 #include "app.h"
 #include "camera/camera.h"
 #include "core/log.h"
+#include "geometry/quad.h"
 #include "memory/memory.h"
 #include "platform/input.h"
 #include "renderer/renderer.h"
@@ -27,7 +28,8 @@ Result app_init(AppContext *app, const AppConfig *config) {
   app->delta_time  = 0.0;
   app->total_time  = 0.0;
   app->frame_count = 0;
-  app->camera      = camera_default();
+  app->camera       = camera_default();
+  app->entity_count = 0;
 
   // Initialize window system
   Result result = window_system_init();
@@ -95,6 +97,42 @@ Result app_init(AppContext *app, const AppConfig *config) {
     window_system_shutdown();
     return result;
   }
+
+  // Create quad entity
+  Arena *perm_arena = permanent_memory(&app->memory);
+
+  Mesh *quad_mesh = ARENA_PUSH_STRUCT(perm_arena, Mesh);
+  if(!quad_mesh) {
+    LOG_ERROR("Failed to allocate quad mesh");
+    renderer_destroy(app->renderer);
+    simulation_shutdown(&app->simulation);
+    memory_shutdown(&app->memory);
+    window_destroy(&app->window);
+    window_system_shutdown();
+    return RESULT_ERROR_OUT_OF_MEMORY;
+  }
+
+  quad_create_arena(quad_mesh, perm_arena);
+
+  MeshHandle quad_handle = 0;
+  result = renderer_upload_mesh(app->renderer, quad_mesh, &quad_handle);
+  if(result != RESULT_SUCCESS) {
+    LOG_ERROR("Failed to upload quad mesh");
+    renderer_destroy(app->renderer);
+    simulation_shutdown(&app->simulation);
+    memory_shutdown(&app->memory);
+    window_destroy(&app->window);
+    window_system_shutdown();
+    return result;
+  }
+
+  app->entities[0] = Entity{
+    .position    = {0.0f, 0.0f, 0.0f},
+    .scale       = {1.0f, 1.0f, 1.0f},
+    .mesh        = quad_mesh,
+    .mesh_handle = quad_handle,
+  };
+  app->entity_count = 1;
 
   app->state = APP_STATE_RUNNING;
   LOG_INFO("Application initialized successfully");
@@ -174,7 +212,11 @@ void app_run(AppContext *app) {
         continue;
       }
     }
+
     const f32 velocity = app->camera.movement_speed * (f32)app->delta_time;
+
+
+    // Update camera
 
     if(input_key_down(KEY_W)) {
       app->camera.position += app->camera.front * velocity;
@@ -190,10 +232,11 @@ void app_run(AppContext *app) {
     }
 
     camera_update_vectors(app->camera);
+
     // simulation_update(&app->simulation, app->delta_time);
 
     // Render frame
-    result = renderer_draw(app->renderer, &app->camera);
+    result = renderer_draw(app->renderer, &app->camera, app->entities, app->entity_count);
     if(result != RESULT_SUCCESS) {
       LOG_ERROR("Renderer frame failed: %d", result);
       app_request_shutdown(app);

@@ -2,13 +2,14 @@
 #include "renderer_internal.h"
 
 #include "camera/camera.h"
+#include "core/entity.h"
 #include "core/log.h"
 #include "utils/macros.h"
 #include <string.h>
 
 const i32 ONE_SECOND = 1000000000;
 
-Result renderer_draw(Renderer *renderer, const Camera *camera) {
+Result renderer_draw(Renderer *renderer, const Camera *camera, const Entity *entities, u32 entity_count) {
   if(!renderer || !camera) {
     return RESULT_ERROR_GENERIC;
   }
@@ -116,11 +117,18 @@ Result renderer_draw(Renderer *renderer, const Camera *camera) {
   };
   vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-  VkBuffer     vertex_buffers[] = {renderer->vertex_buffer->buffer};
-  VkDeviceSize offsets[]        = {0};
-  vkCmdBindVertexBuffers(cmd, 0, 1, vertex_buffers, offsets);
-  vkCmdBindIndexBuffer(cmd, renderer->index_buffer->buffer, 0, VK_INDEX_TYPE_UINT32);
-  vkCmdDrawIndexed(cmd, renderer->quad_mesh->index_count, 1, 0, 0, 0);
+  for(u32 i = 0; i < entity_count; ++i) {
+    MeshHandle   handle = entities[i].mesh_handle;
+    if(handle >= renderer->mesh_count) {
+      continue;
+    }
+    const MeshGPU *mesh_gpu        = &renderer->meshes[handle];
+    VkBuffer       vertex_buffers[] = {mesh_gpu->vertex_buffer.buffer};
+    VkDeviceSize   offsets[]        = {0};
+    vkCmdBindVertexBuffers(cmd, 0, 1, vertex_buffers, offsets);
+    vkCmdBindIndexBuffer(cmd, mesh_gpu->index_buffer.buffer, 0, VK_INDEX_TYPE_UINT32);
+    vkCmdDrawIndexed(cmd, mesh_gpu->index_count, 1, 0, 0, 0);
+  }
 
   vkCmdEndRenderPass(cmd);
 

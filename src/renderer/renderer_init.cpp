@@ -1,7 +1,7 @@
 #include "renderer_internal.h"
 
 #include "core/log.h"
-#include "geometry/quad.h"
+#include "geometry/mesh.h"
 
 #include <string.h>
 
@@ -111,6 +111,49 @@ static VkResult renderer_internal_create_camera_uniforms(Renderer *renderer) {
   }
 
   return VK_SUCCESS;
+}
+
+Result renderer_upload_mesh(Renderer *renderer, const Mesh *mesh, MeshHandle *out_handle) {
+  if(!renderer || !mesh || !out_handle) {
+    return RESULT_ERROR_GENERIC;
+  }
+
+  if(renderer->mesh_count >= MAX_MESHES) {
+    LOG_ERROR("Maximum mesh count (%d) reached", MAX_MESHES);
+    return RESULT_ERROR_GENERIC;
+  }
+
+  u32      slot      = renderer->mesh_count;
+  MeshGPU *mesh_gpu  = &renderer->meshes[slot];
+  VkResult vk_result = VK_SUCCESS;
+
+  vk_result = vk_buffer_create_vertex(&renderer->device,
+                                      renderer->command.pool,
+                                      mesh->vertices,
+                                      mesh->vertex_count * sizeof(Vertex),
+                                      &mesh_gpu->vertex_buffer);
+  if(vk_result != VK_SUCCESS) {
+    LOG_ERROR("Failed to create vertex buffer for mesh %u: %d", slot, vk_result);
+    return RESULT_ERROR_VULKAN;
+  }
+
+  vk_result = vk_buffer_create_index(&renderer->device,
+                                     renderer->command.pool,
+                                     mesh->indices,
+                                     mesh->index_count * sizeof(u32),
+                                     &mesh_gpu->index_buffer);
+  if(vk_result != VK_SUCCESS) {
+    LOG_ERROR("Failed to create index buffer for mesh %u: %d", slot, vk_result);
+    vk_buffer_destroy(renderer->device.device, &mesh_gpu->vertex_buffer);
+    return RESULT_ERROR_VULKAN;
+  }
+
+  mesh_gpu->index_count = mesh->index_count;
+  renderer->mesh_count++;
+  *out_handle = slot;
+
+  LOG_INFO("Uploaded mesh %u (%u vertices, %u indices)", slot, mesh->vertex_count, mesh->index_count);
+  return RESULT_SUCCESS;
 }
 
 Result renderer_create(Renderer **out_renderer, WindowContext *window, const RendererConfig *config, Arena *arena) {
@@ -241,55 +284,7 @@ Result renderer_create(Renderer **out_renderer, WindowContext *window, const Ren
     goto fail;
   }
 
-  renderer->quad_mesh = ARENA_PUSH_STRUCT(arena, Mesh);
-  if(!renderer->quad_mesh) {
-    LOG_ERROR("Failed to allocate mesh");
-    error = RESULT_ERROR_OUT_OF_MEMORY;
-    goto fail;
-  }
-
-  quad_create_arena(renderer->quad_mesh, arena);
-  if(!renderer->quad_mesh->vertices || !renderer->quad_mesh->indices) {
-    LOG_ERROR("Failed to create quad mesh");
-    error = RESULT_ERROR_OUT_OF_MEMORY;
-    goto fail;
-  }
-
-  renderer->vertex_buffer = ARENA_PUSH_STRUCT(arena, VkBufferContext);
-  if(!renderer->vertex_buffer) {
-    LOG_ERROR("Failed to allocate vertex buffer context");
-    error = RESULT_ERROR_OUT_OF_MEMORY;
-    goto fail;
-  }
-
-  vk_result = vk_buffer_create_vertex(&renderer->device,
-                                      renderer->command.pool,
-                                      renderer->quad_mesh->vertices,
-                                      renderer->quad_mesh->vertex_count * sizeof(Vertex),
-                                      renderer->vertex_buffer);
-  if(vk_result != VK_SUCCESS) {
-    LOG_ERROR("Failed to create vertex buffer");
-    error = RESULT_ERROR_VULKAN;
-    goto fail;
-  }
-
-  renderer->index_buffer = ARENA_PUSH_STRUCT(arena, VkBufferContext);
-  if(!renderer->index_buffer) {
-    LOG_ERROR("Failed to allocate index buffer context");
-    error = RESULT_ERROR_OUT_OF_MEMORY;
-    goto fail;
-  }
-
-  vk_result = vk_buffer_create_index(&renderer->device,
-                                     renderer->command.pool,
-                                     renderer->quad_mesh->indices,
-                                     renderer->quad_mesh->index_count * sizeof(u32),
-                                     renderer->index_buffer);
-  if(vk_result != VK_SUCCESS) {
-    LOG_ERROR("Failed to create index buffer");
-    error = RESULT_ERROR_VULKAN;
-    goto fail;
-  }
+  renderer->mesh_count = 0;
 
   *out_renderer = renderer;
   LOG_INFO("Renderer initialized successfully");
@@ -313,11 +308,12 @@ void renderer_destroy(Renderer *renderer) {
     vk_device_wait_idle(&renderer->device);
   }
 
-  if(has_device && renderer->index_buffer) {
-    vk_buffer_destroy(renderer->device.device, renderer->index_buffer);
-  }
-  if(has_device && renderer->vertex_buffer) {
-    vk_buffer_destroy(renderer->device.device, renderer->vertex_buffer);
+  if(has_device) {
+    for(u32 i = 0; i < renderer->mesh_count; ++i) {
+      vk_buffer_destroy(renderer->device.device, &renderer->meshes[i].index_buffer);
+      vk_buffer_destroy(renderer->device.device, &renderer->meshes[i].vertex_buffer);
+    }
+    renderer->mesh_count = 0;
   }
   if(has_device) {
     renderer_internal_destroy_camera_uniforms(renderer);

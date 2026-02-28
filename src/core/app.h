@@ -7,6 +7,9 @@
 #include "simulation/simulation.h"
 #include "utils/types.h"
 #include "camera/camera.h"
+#include "core/entity.h"
+
+const i32 MAX_ENTITIES = 1024;
 
 // Forward declarations
 typedef struct Renderer Renderer;
@@ -35,6 +38,8 @@ typedef struct AppContext {
   WindowContext   window;
   Renderer       *renderer;
   Camera          camera;
+  Entity          entities[MAX_ENTITIES];
+  u32             entity_count;
   SimulationState simulation;
   f64             delta_time;
   f64             total_time;

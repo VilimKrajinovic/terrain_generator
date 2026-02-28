@@ -2,7 +2,6 @@
 #define RENDERER_INTERNAL_H
 
 #include "renderer/renderer.h"
-#include "geometry/mesh.h"
 #include "renderer/vk_buffer.h"
 #include "renderer/vk_command.h"
 #include "renderer/vk_device.h"
@@ -12,6 +11,16 @@
 #include "renderer/vk_swapchain.h"
 #include "renderer/vk_sync.h"
 #include "glm/glm.hpp"
+
+#define MAX_MESHES 64
+
+typedef u32 MeshHandle;
+
+typedef struct MeshGPU {
+  VkBufferContext vertex_buffer;
+  VkBufferContext index_buffer;
+  u32             index_count;
+} MeshGPU;
 
 typedef struct CameraUniformData {
   glm::mat4 view;
@@ -30,18 +39,17 @@ struct Renderer {
   VkRenderPassContext *render_pass;
   VkPipelineContext   *pipeline;
 
-  VkFramebuffer framebuffers[MAX_SWAPCHAIN_IMAGES];
-  u32           framebuffer_count;
-  VkFence       images_in_flight[MAX_SWAPCHAIN_IMAGES];
-  VkSemaphore   render_finished[MAX_SWAPCHAIN_IMAGES];
-  VkBufferContext camera_uniform_buffers[MAX_FRAMES_IN_FLIGHT];
-  void           *camera_uniform_mapped[MAX_FRAMES_IN_FLIGHT];
+  VkFramebuffer    framebuffers[MAX_SWAPCHAIN_IMAGES];
+  u32              framebuffer_count;
+  VkFence          images_in_flight[MAX_SWAPCHAIN_IMAGES];
+  VkSemaphore      render_finished[MAX_SWAPCHAIN_IMAGES];
+  VkBufferContext  camera_uniform_buffers[MAX_FRAMES_IN_FLIGHT];
+  void            *camera_uniform_mapped[MAX_FRAMES_IN_FLIGHT];
   VkDescriptorPool descriptor_pool;
   VkDescriptorSet  camera_descriptor_sets[MAX_FRAMES_IN_FLIGHT];
 
-  VkBufferContext *vertex_buffer;
-  VkBufferContext *index_buffer;
-  Mesh            *quad_mesh;
+  MeshGPU meshes[MAX_MESHES];
+  u32     mesh_count;
 
   WindowContext *window;
   bool           swapchain_needs_recreation;
